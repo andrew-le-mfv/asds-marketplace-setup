@@ -44,7 +44,7 @@ changelog:
 
 release:
   github:
-    owner: your-org
+    owner: andrew-le-mfv
     name: asds-marketplace-setup
   draft: false
   prerelease: auto
