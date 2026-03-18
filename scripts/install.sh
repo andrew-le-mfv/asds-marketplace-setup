@@ -4,7 +4,7 @@ set -e
 # ASDS Marketplace Setup — Install Script
 # Usage: curl -fsSL https://raw.githubusercontent.com/your-org/asds-marketplace-setup/main/scripts/install.sh | sh
 
-REPO="your-org/asds-marketplace-setup"
+REPO="andrew-le-mfv/asds-marketplace-setup"
 BINARY_NAME="asds"
 INSTALL_DIR="${ASDS_INSTALL_DIR:-/usr/local/bin}"
 
