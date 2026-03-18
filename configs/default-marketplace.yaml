@@ -1,0 +1,99 @@
+schema_version: 1
+
+marketplace:
+  name: "asds-marketplace"
+  description: "Agentic Software Development Suite"
+  version: "1.0.0"
+  registry_url: "github.com/your-org/asds-marketplace"
+
+roles:
+  developer:
+    display_name: "Software Developer"
+    description: "Full-stack development with code quality tools"
+    plugins:
+      - name: "code-reviewer"
+        source: "code-reviewer@asds-marketplace"
+        required: true
+      - name: "commit-commands"
+        source: "commit-commands@asds-marketplace"
+        required: false
+    claude_md_snippets:
+      - "Follow conventional commits"
+      - "Always write tests for new features"
+
+  frontend:
+    display_name: "Frontend Developer"
+    description: "UI/UX focused development"
+    plugins:
+      - name: "frontend-design"
+        source: "frontend-design@asds-marketplace"
+        required: true
+      - name: "playwright"
+        source: "playwright@asds-marketplace"
+        required: false
+
+  backend:
+    display_name: "Backend Developer"
+    description: "API and server-side development"
+    plugins:
+      - name: "code-reviewer"
+        source: "code-reviewer@asds-marketplace"
+        required: true
+      - name: "security-guidance"
+        source: "security-guidance@asds-marketplace"
+        required: false
+
+  devops:
+    display_name: "DevOps Engineer"
+    description: "CI/CD, infrastructure, and deployment"
+    plugins:
+      - name: "security-guidance"
+        source: "security-guidance@asds-marketplace"
+        required: true
+
+  tester:
+    display_name: "QA / Tester"
+    description: "Testing and quality assurance"
+    plugins:
+      - name: "playwright"
+        source: "playwright@asds-marketplace"
+        required: true
+
+  security:
+    display_name: "Security Engineer"
+    description: "Security auditing and compliance"
+    plugins:
+      - name: "security-guidance"
+        source: "security-guidance@asds-marketplace"
+        required: true
+
+  techlead:
+    display_name: "Tech Lead"
+    description: "Architecture, code review, and team standards"
+    plugins:
+      - name: "code-reviewer"
+        source: "code-reviewer@asds-marketplace"
+        required: true
+      - name: "code-simplifier"
+        source: "code-simplifier@asds-marketplace"
+        required: false
+
+  data-engineer:
+    display_name: "Data Engineer"
+    description: "Data pipelines and analytics"
+    plugins:
+      - name: "code-simplifier"
+        source: "code-simplifier@asds-marketplace"
+        required: false
+
+  pm:
+    display_name: "Product Manager"
+    description: "Product planning and requirements"
+    plugins:
+      - name: "feature-dev"
+        source: "feature-dev@asds-marketplace"
+        required: true
+
+defaults:
+  scope: project
+  auto_register_marketplace: true
