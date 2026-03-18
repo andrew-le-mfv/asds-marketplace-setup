@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/your-org/asds-marketplace-setup/configs"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/configs"
 )
 
 // DefaultMarketplaceConfig returns the embedded fallback marketplace configuration.

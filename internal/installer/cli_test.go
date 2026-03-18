@@ -3,7 +3,7 @@ package installer_test
 import (
 	"testing"
 
-	"github.com/your-org/asds-marketplace-setup/internal/installer"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func TestCLIInstaller_Method(t *testing.T) {

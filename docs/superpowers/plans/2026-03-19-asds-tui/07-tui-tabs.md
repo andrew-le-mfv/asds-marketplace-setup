@@ -23,8 +23,8 @@ Create `internal/tui/setup/model.go`:
 package setup
 
 import (
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 // Step tracks the wizard's current position.
@@ -125,9 +125,9 @@ import (
 
  tea "github.com/charmbracelet/bubbletea"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 // InstallCompleteMsg is sent when installation finishes.
@@ -302,7 +302,7 @@ import (
 
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // View renders the setup wizard.
@@ -482,9 +482,9 @@ Create `internal/tui/status/model.go`:
 package status
 
 import (
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 // ScopeInfo holds the status for one scope.
@@ -559,7 +559,7 @@ import (
 
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // View renders the status dashboard.
@@ -628,7 +628,7 @@ Create `internal/tui/plugins/model.go`:
 package plugins
 
 import (
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // PluginItem represents a plugin in the browser list.
@@ -718,7 +718,7 @@ import (
 
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // View renders the plugin browser.
@@ -785,7 +785,7 @@ Create `internal/tui/config/model.go`:
 package config
 
 import (
- appconfig "github.com/your-org/asds-marketplace-setup/internal/config"
+ appconfig "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // Model holds the config viewer state.
@@ -842,7 +842,7 @@ import (
 
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // View renders the config viewer.
@@ -898,11 +898,11 @@ Update `internal/tui/app.go` to import all tab packages and add model fields:
 ```go
 import (
  // ... existing imports ...
- tuiconfig "github.com/your-org/asds-marketplace-setup/internal/tui/config"
- "github.com/your-org/asds-marketplace-setup/internal/tui/plugins"
- "github.com/your-org/asds-marketplace-setup/internal/tui/setup"
- "github.com/your-org/asds-marketplace-setup/internal/tui/status"
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ tuiconfig "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/plugins"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/setup"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/status"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 ```
 

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // SettingsPath returns the Claude settings file path for the given scope.

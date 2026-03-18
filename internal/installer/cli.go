@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // CLIInstaller shells out to the Claude Code CLI for plugin management.

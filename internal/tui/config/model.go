@@ -1,7 +1,7 @@
 package config
 
 import (
-	appconfig "github.com/your-org/asds-marketplace-setup/internal/config"
+	appconfig "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // Model holds the config viewer state.

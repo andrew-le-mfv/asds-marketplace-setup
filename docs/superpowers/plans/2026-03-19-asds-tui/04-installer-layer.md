@@ -24,7 +24,7 @@ package installer_test
 import (
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func TestDetectClaudeCode(t *testing.T) {
@@ -117,7 +117,7 @@ Create `internal/installer/installer.go`:
 package installer
 
 import (
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // InstallResult holds the outcome of a plugin install/uninstall operation.
@@ -177,8 +177,8 @@ import (
  "path/filepath"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func TestDirectInstaller_Install(t *testing.T) {
@@ -361,8 +361,8 @@ Create `internal/installer/direct.go`:
 package installer
 
 import (
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // DirectInstaller writes enabledPlugins directly to Claude settings JSON files.
@@ -476,7 +476,7 @@ package installer_test
 import (
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func TestCLIInstaller_Method(t *testing.T) {
@@ -542,7 +542,7 @@ import (
  "fmt"
  "os/exec"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // CLIInstaller shells out to the Claude Code CLI for plugin management.

@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/your-org/asds-marketplace-setup/internal/claude"
-	"github.com/your-org/asds-marketplace-setup/internal/config"
-	"github.com/your-org/asds-marketplace-setup/internal/installer"
-	"github.com/your-org/asds-marketplace-setup/pkg/registry"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 func newInstallCmd() *cobra.Command {

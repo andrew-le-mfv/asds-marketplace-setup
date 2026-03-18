@@ -1,9 +1,9 @@
 package status
 
 import (
-	"github.com/your-org/asds-marketplace-setup/internal/claude"
-	"github.com/your-org/asds-marketplace-setup/internal/config"
-	"github.com/your-org/asds-marketplace-setup/internal/installer"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 // ScopeInfo holds the status for one scope.

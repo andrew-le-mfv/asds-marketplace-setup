@@ -6,10 +6,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
-	"github.com/your-org/asds-marketplace-setup/internal/claude"
-	"github.com/your-org/asds-marketplace-setup/internal/config"
-	"github.com/your-org/asds-marketplace-setup/internal/tui"
-	"github.com/your-org/asds-marketplace-setup/pkg/registry"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 const version = "0.1.0"

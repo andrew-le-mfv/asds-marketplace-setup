@@ -265,7 +265,7 @@ import (
  tea "github.com/charmbracelet/bubbletea"
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // Model is the About tab model.
@@ -308,7 +308,7 @@ func (m Model) View() string {
   styles.SubtitleStyle.Render("A TUI for bootstrapping developers into curated"),
   styles.SubtitleStyle.Render("Claude Code plugin sets organized by role."),
   "",
-  styles.HelpStyle.Render("GitHub: github.com/your-org/asds-marketplace-setup"),
+  styles.HelpStyle.Render("GitHub: github.com/andrew-le-mfv/asds-marketplace-setup"),
   styles.HelpStyle.Render("Docs:   https://your-org.github.io/asds-marketplace-setup"),
  )
 
@@ -330,8 +330,8 @@ import (
  tea "github.com/charmbracelet/bubbletea"
  "github.com/charmbracelet/lipgloss"
 
- "github.com/your-org/asds-marketplace-setup/internal/tui/about"
- "github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/about"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // App is the root Bubble Tea model for the ASDS dashboard.
@@ -477,7 +477,7 @@ Modify `internal/commands/root.go` — replace the `RunE` function body:
   },
 ```
 
-Add import `"github.com/your-org/asds-marketplace-setup/internal/tui"` and
+Add import `"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui"` and
 `tea "github.com/charmbracelet/bubbletea"` to root.go.
 
 - [ ] **Step 4: Verify it compiles**

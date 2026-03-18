@@ -27,7 +27,7 @@ import (
  "net/http/httptest"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/pkg/registry"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 func TestFetchMarketplaceConfig_Success(t *testing.T) {
@@ -154,7 +154,7 @@ import (
  "strings"
  "time"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 const (
@@ -252,10 +252,10 @@ import (
 
  "github.com/spf13/cobra"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
- "github.com/your-org/asds-marketplace-setup/pkg/registry"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 func newInstallCmd() *cobra.Command {
@@ -481,9 +481,9 @@ import (
 
  "github.com/spf13/cobra"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func newUninstallCmd() *cobra.Command {
@@ -588,9 +588,9 @@ import (
 
  "github.com/spf13/cobra"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func newStatusCmd() *cobra.Command {
@@ -688,10 +688,10 @@ import (
 
  "github.com/spf13/cobra"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
- "github.com/your-org/asds-marketplace-setup/pkg/registry"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 func newUpdateCmd() *cobra.Command {
@@ -848,9 +848,9 @@ import (
 
  "github.com/spf13/cobra"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
- "github.com/your-org/asds-marketplace-setup/internal/installer"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
 
 func newResetCmd() *cobra.Command {
@@ -982,7 +982,7 @@ import (
  "bytes"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/commands"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/commands"
 )
 
 func TestRootCmd_Version(t *testing.T) {

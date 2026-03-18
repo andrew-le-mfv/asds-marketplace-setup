@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/your-org/asds-marketplace-setup/internal/claude"
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestSettingsPath(t *testing.T) {

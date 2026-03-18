@@ -1,4 +1,4 @@
-module github.com/your-org/asds-marketplace-setup
+module github.com/andrew-le-mfv/asds-marketplace-setup
 
 go 1.26.1
 

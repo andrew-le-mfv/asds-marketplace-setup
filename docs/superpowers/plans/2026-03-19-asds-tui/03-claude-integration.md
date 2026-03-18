@@ -27,8 +27,8 @@ import (
  "path/filepath"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestSettingsPath(t *testing.T) {
@@ -170,7 +170,7 @@ import (
  "os"
  "path/filepath"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // SettingsPath returns the Claude settings file path for the given scope.
@@ -282,7 +282,7 @@ import (
  "path/filepath"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
 )
 
 func TestReadSettings_NewFile(t *testing.T) {
@@ -567,7 +567,7 @@ import (
  "strings"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/claude"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
 )
 
 func TestUpsertMarkerBlock_NewFile(t *testing.T) {

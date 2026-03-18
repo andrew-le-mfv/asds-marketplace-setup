@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/your-org/asds-marketplace-setup/pkg/registry"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 func TestFetchMarketplaceConfig_Success(t *testing.T) {

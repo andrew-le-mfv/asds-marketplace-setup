@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // View renders the status dashboard.

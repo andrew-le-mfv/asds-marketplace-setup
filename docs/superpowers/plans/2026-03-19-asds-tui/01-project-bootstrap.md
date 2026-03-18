@@ -18,7 +18,7 @@
 
 ```bash
 cd /Users/le.tuan.anh/Workspace/MFVWorkspace/asds-marketplace-setup
-go mod init github.com/your-org/asds-marketplace-setup
+go mod init github.com/andrew-le-mfv/asds-marketplace-setup
 ```
 
 - [ ] **Step 2: Add all dependencies**
@@ -96,7 +96,7 @@ package main
 import (
  "os"
 
- "github.com/your-org/asds-marketplace-setup/internal/commands"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/commands"
 )
 
 func main() {
@@ -141,7 +141,7 @@ package config_test
 import (
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestParseMarketplaceConfig(t *testing.T) {
@@ -362,7 +362,7 @@ import (
  "testing"
  "time"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestManifest_JSON_Roundtrip(t *testing.T) {

@@ -132,7 +132,7 @@ package config_test
 import (
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestDefaultMarketplaceConfig(t *testing.T) {
@@ -192,7 +192,7 @@ Then create `internal/config/defaults.go`:
 package config
 
 import (
- "github.com/your-org/asds-marketplace-setup/configs"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/configs"
 )
 
 // DefaultMarketplaceConfig returns the embedded fallback marketplace configuration.
@@ -367,7 +367,7 @@ import (
  "path/filepath"
  "testing"
 
- "github.com/your-org/asds-marketplace-setup/internal/config"
+ "github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestASDSConfig_Defaults(t *testing.T) {

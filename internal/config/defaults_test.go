@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 func TestDefaultMarketplaceConfig(t *testing.T) {

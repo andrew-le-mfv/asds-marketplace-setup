@@ -1,7 +1,7 @@
 package installer
 
 import (
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 // InstallResult holds the outcome of a plugin install/uninstall operation.

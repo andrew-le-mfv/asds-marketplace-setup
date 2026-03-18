@@ -7,13 +7,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/your-org/asds-marketplace-setup/internal/config"
-	"github.com/your-org/asds-marketplace-setup/internal/tui/about"
-	tuiconfig "github.com/your-org/asds-marketplace-setup/internal/tui/config"
-	"github.com/your-org/asds-marketplace-setup/internal/tui/plugins"
-	"github.com/your-org/asds-marketplace-setup/internal/tui/setup"
-	"github.com/your-org/asds-marketplace-setup/internal/tui/status"
-	"github.com/your-org/asds-marketplace-setup/internal/tui/styles"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/about"
+	tuiconfig "github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/plugins"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/setup"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/status"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
 // App is the root Bubble Tea model for the ASDS dashboard.

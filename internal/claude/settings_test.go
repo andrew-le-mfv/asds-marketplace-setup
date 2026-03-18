@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/your-org/asds-marketplace-setup/internal/claude"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
 )
 
 func TestReadSettings_NewFile(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/your-org/asds-marketplace-setup/internal/config"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 )
 
 const (

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/your-org/asds-marketplace-setup/internal/commands"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/commands"
 )
 
 func main() {
