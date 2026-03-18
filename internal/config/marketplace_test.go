@@ -110,3 +110,96 @@ defaults:
 		t.Errorf("role names = %v, want [developer frontend]", names)
 	}
 }
+
+func TestMarketplaceConfig_Validate(t *testing.T) {
+	tests := []struct {
+		name    string
+		yaml    string
+		wantErr bool
+	}{
+		{
+			name: "valid config",
+			yaml: `
+schema_version: 1
+marketplace:
+  name: "test"
+  version: "1.0.0"
+  registry_url: "github.com/test"
+roles:
+  developer:
+    display_name: "Developer"
+    description: "Dev"
+    plugins:
+      - name: "plugin-a"
+        source: "plugin-a@test"
+defaults:
+  scope: project
+`,
+			wantErr: false,
+		},
+		{
+			name: "missing schema_version",
+			yaml: `
+marketplace:
+  name: "test"
+  version: "1.0.0"
+  registry_url: "github.com/test"
+roles:
+  developer:
+    display_name: "Developer"
+    description: "Dev"
+defaults:
+  scope: project
+`,
+			wantErr: true,
+		},
+		{
+			name: "no roles",
+			yaml: `
+schema_version: 1
+marketplace:
+  name: "test"
+  version: "1.0.0"
+  registry_url: "github.com/test"
+defaults:
+  scope: project
+`,
+			wantErr: true,
+		},
+		{
+			name: "missing marketplace name",
+			yaml: `
+schema_version: 1
+marketplace:
+  version: "1.0.0"
+  registry_url: "github.com/test"
+roles:
+  developer:
+    display_name: "Developer"
+    description: "Dev"
+defaults:
+  scope: project
+`,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg, err := config.ParseMarketplaceConfig([]byte(tt.yaml))
+			if err != nil {
+				if !tt.wantErr {
+					t.Fatalf("unexpected parse error: %v", err)
+				}
+				return
+			}
+			err = cfg.Validate()
+			if tt.wantErr && err == nil {
+				t.Error("expected validation error, got nil")
+			}
+			if !tt.wantErr && err != nil {
+				t.Errorf("unexpected validation error: %v", err)
+			}
+		})
+	}
+}

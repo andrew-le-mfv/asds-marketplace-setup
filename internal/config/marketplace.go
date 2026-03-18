@@ -53,6 +53,20 @@ func ParseMarketplaceConfig(data []byte) (*MarketplaceConfig, error) {
 	return &cfg, nil
 }
 
+// Validate checks the MarketplaceConfig for required fields.
+func (c *MarketplaceConfig) Validate() error {
+	if c.SchemaVersion < 1 {
+		return fmt.Errorf("schema_version must be >= 1, got %d", c.SchemaVersion)
+	}
+	if c.Marketplace.Name == "" {
+		return fmt.Errorf("marketplace.name is required")
+	}
+	if len(c.Roles) == 0 {
+		return fmt.Errorf("at least one role must be defined")
+	}
+	return nil
+}
+
 // RoleNames returns sorted role IDs.
 func (c *MarketplaceConfig) RoleNames() []string {
 	names := make([]string, 0, len(c.Roles))
