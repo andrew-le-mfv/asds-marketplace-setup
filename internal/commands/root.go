@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"fmt"
-
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
+
+	"github.com/your-org/asds-marketplace-setup/internal/tui"
 )
 
 const version = "0.1.0"
@@ -14,9 +15,10 @@ func NewRootCmd() *cobra.Command {
 		Short: "ASDS — Agentic Software Development Suite",
 		Long:  "A TUI for bootstrapping developers into curated Claude Code plugin sets organized by role.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Will launch dashboard TUI in Part 6
-			fmt.Println("ASDS dashboard TUI — coming soon")
-			return nil
+			app := tui.NewApp(version)
+			p := tea.NewProgram(app, tea.WithAltScreen())
+			_, err := p.Run()
+			return err
 		},
 	}
 
