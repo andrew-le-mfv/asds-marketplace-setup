@@ -1,0 +1,180 @@
+schema_version: 1
+
+marketplace:
+  name: "asds-marketplace"
+  description: "Agentic Software Development Suite"
+  version: "1.0.0"
+  registry_url: "github.com/anthropics/claude-plugins-official"
+
+roles:
+  developer:
+    display_name: "Software Developer"
+    description: "Full-stack development with code quality tools"
+    plugins:
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "commit-commands"
+        source: "commit-commands@claude-plugins-official"
+        required: true
+      - name: "pr-review-toolkit"
+        source: "pr-review-toolkit@claude-plugins-official"
+        required: false
+    claude_md_snippets:
+      - "Follow conventional commits"
+      - "Always write tests for new features"
+
+  frontend:
+    display_name: "Frontend Developer"
+    description: "UI/UX focused development"
+    plugins:
+      - name: "frontend-design"
+        source: "frontend-design@claude-plugins-official"
+        required: true
+      - name: "typescript-lsp"
+        source: "typescript-lsp@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: false
+
+  backend:
+    display_name: "Backend Developer"
+    description: "API and server-side development"
+    plugins:
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "security-guidance"
+        source: "security-guidance@claude-plugins-official"
+        required: true
+      - name: "pr-review-toolkit"
+        source: "pr-review-toolkit@claude-plugins-official"
+        required: false
+
+  devops:
+    display_name: "DevOps Engineer"
+    description: "CI/CD, infrastructure, and deployment"
+    plugins:
+      - name: "security-guidance"
+        source: "security-guidance@claude-plugins-official"
+        required: true
+      - name: "commit-commands"
+        source: "commit-commands@claude-plugins-official"
+        required: true
+      - name: "hookify"
+        source: "hookify@claude-plugins-official"
+        required: false
+
+  tester:
+    display_name: "QA / Tester"
+    description: "Testing and quality assurance"
+    plugins:
+      - name: "pr-review-toolkit"
+        source: "pr-review-toolkit@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: false
+
+  security:
+    display_name: "Security Engineer"
+    description: "Security auditing and compliance"
+    plugins:
+      - name: "security-guidance"
+        source: "security-guidance@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "pr-review-toolkit"
+        source: "pr-review-toolkit@claude-plugins-official"
+        required: false
+
+  techlead:
+    display_name: "Tech Lead"
+    description: "Architecture, code review, and team standards"
+    plugins:
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "code-simplifier"
+        source: "code-simplifier@claude-plugins-official"
+        required: true
+      - name: "feature-dev"
+        source: "feature-dev@claude-plugins-official"
+        required: false
+      - name: "claude-md-management"
+        source: "claude-md-management@claude-plugins-official"
+        required: false
+
+  data-engineer:
+    display_name: "Data Engineer"
+    description: "Data pipelines and analytics"
+    plugins:
+      - name: "code-simplifier"
+        source: "code-simplifier@claude-plugins-official"
+        required: true
+      - name: "pyright-lsp"
+        source: "pyright-lsp@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: false
+
+  pm:
+    display_name: "Product Manager"
+    description: "Product planning and requirements"
+    plugins:
+      - name: "feature-dev"
+        source: "feature-dev@claude-plugins-official"
+        required: true
+      - name: "claude-md-management"
+        source: "claude-md-management@claude-plugins-official"
+        required: true
+
+  plugin-developer:
+    display_name: "Plugin Developer"
+    description: "Building Claude Code plugins and extensions"
+    plugins:
+      - name: "plugin-dev"
+        source: "plugin-dev@claude-plugins-official"
+        required: true
+      - name: "skill-creator"
+        source: "skill-creator@claude-plugins-official"
+        required: true
+      - name: "agent-sdk-dev"
+        source: "agent-sdk-dev@claude-plugins-official"
+        required: false
+
+  go-developer:
+    display_name: "Go Developer"
+    description: "Go/Golang development with LSP support"
+    plugins:
+      - name: "gopls-lsp"
+        source: "gopls-lsp@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "commit-commands"
+        source: "commit-commands@claude-plugins-official"
+        required: false
+
+  rust-developer:
+    display_name: "Rust Developer"
+    description: "Rust development with LSP support"
+    plugins:
+      - name: "rust-analyzer-lsp"
+        source: "rust-analyzer-lsp@claude-plugins-official"
+        required: true
+      - name: "code-review"
+        source: "code-review@claude-plugins-official"
+        required: true
+      - name: "security-guidance"
+        source: "security-guidance@claude-plugins-official"
+        required: false
+
+defaults:
+  scope: project
+  auto_register_marketplace: true
