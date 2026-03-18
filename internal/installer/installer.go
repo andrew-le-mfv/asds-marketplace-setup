@@ -25,3 +25,16 @@ type Installer interface {
 	// Method returns "cli" or "direct" for manifest tracking.
 	Method() string
 }
+
+// NewInstaller creates the appropriate installer based on Claude Code availability.
+// If preferCLI is true and Claude Code is detected, returns CLIInstaller.
+// Otherwise returns DirectInstaller.
+func NewInstaller(preferCLI bool) Installer {
+	if preferCLI {
+		detection := DetectClaudeCode()
+		if detection.Found {
+			return &CLIInstaller{claudePath: detection.Path}
+		}
+	}
+	return &DirectInstaller{}
+}
