@@ -7,7 +7,7 @@ A TUI for bootstrapping developers into curated Claude Code plugin sets organize
 ### Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/master/scripts/install.sh | sh
 ```
 
 Or download a binary from [GitHub Releases](https://github.com/andrew-le-mfv/asds-marketplace-setup/releases).

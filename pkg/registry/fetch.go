@@ -23,7 +23,7 @@ func BuildRawURL(registryURL string) string {
 
 	if strings.HasPrefix(registryURL, "github.com/") {
 		path := strings.TrimPrefix(registryURL, "github.com/")
-		return fmt.Sprintf("https://raw.githubusercontent.com/%s/main/%s", path, defaultYAMLFile)
+		return fmt.Sprintf("https://raw.githubusercontent.com/%s/master/%s", path, defaultYAMLFile)
 	}
 
 	return "https://" + registryURL
