@@ -1,7 +1,10 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -50,4 +53,35 @@ type ManifestPlugin struct {
 	FullRef     string    `json:"full_ref"`
 	Required    bool      `json:"required"`
 	InstalledAt time.Time `json:"installed_at"`
+}
+
+// WriteManifest writes the manifest to disk as formatted JSON.
+func WriteManifest(path string, m *Manifest) error {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return fmt.Errorf("creating manifest directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshaling manifest: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		return fmt.Errorf("writing manifest: %w", err)
+	}
+	return nil
+}
+
+// ReadManifest reads a manifest from disk.
+func ReadManifest(path string) (*Manifest, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading manifest: %w", err)
+	}
+
+	var m Manifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, fmt.Errorf("parsing manifest: %w", err)
+	}
+	return &m, nil
 }

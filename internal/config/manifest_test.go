@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -96,5 +97,59 @@ func TestParseScope(t *testing.T) {
 		if got != tt.want {
 			t.Errorf("ParseScope(%q) = %q, want %q", tt.input, got, tt.want)
 		}
+	}
+}
+
+func TestManifest_WriteAndRead(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".asds-manifest.json")
+
+	now := time.Date(2026, 3, 18, 10, 0, 0, 0, time.UTC)
+	m := config.Manifest{
+		SchemaVersion:      1,
+		ASDSVersion:        "0.1.0",
+		InstalledAt:        now,
+		UpdatedAt:          now,
+		Role:               "developer",
+		Scope:              config.ScopeProject,
+		MarketplaceSource:  "github.com/test/marketplace",
+		InstallMethod:      "direct",
+		ClaudeCodeDetected: false,
+		Plugins: []config.ManifestPlugin{
+			{
+				Name:        "code-reviewer",
+				FullRef:     "code-reviewer@test-marketplace",
+				Required:    true,
+				InstalledAt: now,
+			},
+		},
+		ClaudeMDModified: true,
+		ScaffoldedFiles:  []string{".claude/settings.json"},
+	}
+
+	if err := config.WriteManifest(path, &m); err != nil {
+		t.Fatalf("WriteManifest error: %v", err)
+	}
+
+	loaded, err := config.ReadManifest(path)
+	if err != nil {
+		t.Fatalf("ReadManifest error: %v", err)
+	}
+
+	if loaded.Role != "developer" {
+		t.Errorf("role = %q, want %q", loaded.Role, "developer")
+	}
+	if loaded.Scope != config.ScopeProject {
+		t.Errorf("scope = %q, want %q", loaded.Scope, config.ScopeProject)
+	}
+	if len(loaded.Plugins) != 1 {
+		t.Fatalf("plugins count = %d, want 1", len(loaded.Plugins))
+	}
+}
+
+func TestReadManifest_NotFound(t *testing.T) {
+	_, err := config.ReadManifest("/nonexistent/path/manifest.json")
+	if err == nil {
+		t.Error("expected error for missing file, got nil")
 	}
 }
