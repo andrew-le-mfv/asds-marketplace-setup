@@ -3,6 +3,7 @@ package claude_test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/your-org/asds-marketplace-setup/internal/claude"
@@ -127,5 +128,29 @@ func TestFindProjectRoot_NoGit(t *testing.T) {
 	// Falls back to cwd (the dir itself)
 	if got != dir {
 		t.Errorf("FindProjectRoot() = %q, want %q (fallback)", got, dir)
+	}
+}
+
+func TestEnsureGitignore(t *testing.T) {
+	dir := t.TempDir()
+	claudeDir := filepath.Join(dir, ".claude")
+	os.MkdirAll(claudeDir, 0o755)
+
+	err := claude.EnsureGitignore(claudeDir, ".asds-manifest.local.json")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	data, _ := os.ReadFile(filepath.Join(claudeDir, ".gitignore"))
+	if !strings.Contains(string(data), ".asds-manifest.local.json") {
+		t.Error("entry not added to .gitignore")
+	}
+
+	// Idempotent: calling again should not duplicate
+	claude.EnsureGitignore(claudeDir, ".asds-manifest.local.json")
+	data, _ = os.ReadFile(filepath.Join(claudeDir, ".gitignore"))
+	count := strings.Count(string(data), ".asds-manifest.local.json")
+	if count != 1 {
+		t.Errorf("entry duplicated: found %d times", count)
 	}
 }

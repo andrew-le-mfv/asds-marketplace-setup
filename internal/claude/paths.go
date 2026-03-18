@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/your-org/asds-marketplace-setup/internal/config"
 )
@@ -72,6 +73,36 @@ func FindProjectRoot(startDir string) (string, error) {
 		}
 		dir = parent
 	}
+}
+
+// EnsureGitignore ensures the given entry is present in dir/.gitignore.
+// Creates the .gitignore file if it doesn't exist.
+func EnsureGitignore(dir string, entry string) error {
+	gitignorePath := filepath.Join(dir, ".gitignore")
+
+	data, err := os.ReadFile(gitignorePath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("reading .gitignore: %w", err)
+	}
+
+	content := string(data)
+	// Check if entry already exists
+	for _, line := range strings.Split(content, "\n") {
+		if strings.TrimSpace(line) == entry {
+			return nil // Already present
+		}
+	}
+
+	// Append entry
+	if len(content) > 0 && !strings.HasSuffix(content, "\n") {
+		content += "\n"
+	}
+	content += entry + "\n"
+
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+	return os.WriteFile(gitignorePath, []byte(content), 0o644)
 }
 
 func userClaudeDir() string {
