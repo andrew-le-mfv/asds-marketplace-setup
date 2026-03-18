@@ -96,7 +96,7 @@ func TestBuildRawURL(t *testing.T) {
 	}{
 		{
 			"github.com/your-org/asds-marketplace",
-			"https://raw.githubusercontent.com/your-org/asds-marketplace/main/asds-marketplace.yaml",
+			"https://raw.githubusercontent.com/your-org/asds-marketplace/master/asds-marketplace.yaml",
 		},
 		{
 			"https://example.com/config.yaml",

@@ -2,7 +2,7 @@
 set -e
 
 # ASDS Marketplace Setup — Install Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/main/scripts/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/master/scripts/install.sh | sh
 
 REPO="andrew-le-mfv/asds-marketplace-setup"
 BINARY_NAME="asds"
