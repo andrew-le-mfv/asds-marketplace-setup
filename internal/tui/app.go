@@ -7,7 +7,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/your-org/asds-marketplace-setup/internal/config"
 	"github.com/your-org/asds-marketplace-setup/internal/tui/about"
+	tuiconfig "github.com/your-org/asds-marketplace-setup/internal/tui/config"
+	"github.com/your-org/asds-marketplace-setup/internal/tui/plugins"
+	"github.com/your-org/asds-marketplace-setup/internal/tui/setup"
+	"github.com/your-org/asds-marketplace-setup/internal/tui/status"
 	"github.com/your-org/asds-marketplace-setup/internal/tui/styles"
 )
 
@@ -20,16 +25,24 @@ type App struct {
 	height    int
 
 	// Tab models
-	aboutModel about.Model
+	setupModel   setup.Model
+	pluginsModel plugins.Model
+	configModel  tuiconfig.Model
+	statusModel  status.Model
+	aboutModel   about.Model
 }
 
 // NewApp creates a new App model.
-func NewApp(version string) App {
+func NewApp(version string, cfg *config.MarketplaceConfig, projectRoot string) App {
 	return App{
-		activeTab:  TabSetup,
-		tabs:       AllTabs(),
-		keys:       DefaultKeyMap(),
-		aboutModel: about.New(version),
+		activeTab:    TabSetup,
+		tabs:         AllTabs(),
+		keys:         DefaultKeyMap(),
+		setupModel:   setup.New(cfg, projectRoot),
+		pluginsModel: plugins.New(cfg),
+		configModel:  tuiconfig.New(),
+		statusModel:  status.New(projectRoot),
+		aboutModel:   about.New(version),
 	}
 }
 
@@ -61,6 +74,14 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Route to active tab
 	var cmd tea.Cmd
 	switch a.activeTab {
+	case TabSetup:
+		a.setupModel, cmd = a.setupModel.Update(msg)
+	case TabPlugins:
+		a.pluginsModel, cmd = a.pluginsModel.Update(msg)
+	case TabConfig:
+		a.configModel, cmd = a.configModel.Update(msg)
+	case TabStatus:
+		a.statusModel, cmd = a.statusModel.Update(msg)
 	case TabAbout:
 		a.aboutModel, cmd = a.aboutModel.Update(msg)
 	}
@@ -103,13 +124,13 @@ func (a App) renderTabBar() string {
 func (a App) renderContent() string {
 	switch a.activeTab {
 	case TabSetup:
-		return a.placeholderView("Setup", "Role selection wizard — coming in Part 7")
+		return a.setupModel.View()
 	case TabPlugins:
-		return a.placeholderView("Plugins", "Plugin browser — coming in Part 7")
+		return a.pluginsModel.View()
 	case TabConfig:
-		return a.placeholderView("Config", "Configuration viewer — coming in Part 7")
+		return a.configModel.View()
 	case TabStatus:
-		return a.placeholderView("Status", "Status dashboard — coming in Part 7")
+		return a.statusModel.View()
 	case TabAbout:
 		return a.aboutModel.View()
 	default:
@@ -125,15 +146,4 @@ func (a App) renderFooter() string {
 		"q quit",
 	}
 	return styles.FooterStyle.Render(strings.Join(keys, "  │  "))
-}
-
-func (a App) placeholderView(title, description string) string {
-	content := lipgloss.JoinVertical(lipgloss.Left,
-		"",
-		styles.TitleStyle.Render(title),
-		"",
-		styles.SubtitleStyle.Render(description),
-		"",
-	)
-	return styles.BoxStyle.Render(content)
 }

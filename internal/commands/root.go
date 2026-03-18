@@ -1,10 +1,15 @@
 package commands
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
+	"github.com/your-org/asds-marketplace-setup/internal/claude"
+	"github.com/your-org/asds-marketplace-setup/internal/config"
 	"github.com/your-org/asds-marketplace-setup/internal/tui"
+	"github.com/your-org/asds-marketplace-setup/pkg/registry"
 )
 
 const version = "0.1.0"
@@ -15,9 +20,17 @@ func NewRootCmd() *cobra.Command {
 		Short: "ASDS — Agentic Software Development Suite",
 		Long:  "A TUI for bootstrapping developers into curated Claude Code plugin sets organized by role.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			app := tui.NewApp(version)
+			projectRoot, _ := claude.FindProjectRoot(".")
+
+			asdsCfg, _ := config.ReadASDSConfig(config.ResolveASDSConfigPath())
+			mktCfg, err := registry.FetchOrDefault(asdsCfg.MarketplaceURL)
+			if err != nil {
+				return fmt.Errorf("loading marketplace config: %w", err)
+			}
+
+			app := tui.NewApp(version, mktCfg, projectRoot)
 			p := tea.NewProgram(app, tea.WithAltScreen())
-			_, err := p.Run()
+			_, err = p.Run()
 			return err
 		},
 	}
