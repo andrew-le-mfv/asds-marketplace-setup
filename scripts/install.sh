@@ -7,7 +7,7 @@ set -e
 REPO="andrew-le-mfv/asds-marketplace-setup"
 MODULE="github.com/${REPO}/cmd/asds"
 BINARY_NAME="asds"
-INSTALL_DIR="${ASDS_INSTALL_DIR:-/usr/local/bin}"
+INSTALL_DIR="${ASDS_INSTALL_DIR:-${HOME}/.local/bin}"
 
 TMPDIR=""
 TMPGOBIN=""
@@ -36,7 +36,7 @@ case "$ARCH" in
 		;;
 esac
 
-case "$OS" in
+	case "$OS" in
 	linux)  OS="linux" ;;
 	darwin) OS="darwin" ;;
 	*)
@@ -44,6 +44,20 @@ case "$OS" in
 		exit 1
 		;;
 esac
+
+ensure_install_dir() {
+	if [ ! -d "$INSTALL_DIR" ]; then
+		mkdir -p "$INSTALL_DIR" || {
+			echo "Error: could not create ${INSTALL_DIR}"
+			exit 1
+		}
+	fi
+	if [ ! -w "$INSTALL_DIR" ]; then
+		echo "Error: ${INSTALL_DIR} is not writable"
+		echo "Set ASDS_INSTALL_DIR to a directory you own (default is \$HOME/.local/bin)."
+		exit 1
+	fi
+}
 
 echo "Fetching latest release..."
 JSON=$(curl -sS "https://api.github.com/repos/${REPO}/releases/latest")
@@ -67,13 +81,9 @@ install_from_release() {
 	echo "Extracting..."
 	tar -xzf "${TMPDIR}/${FILENAME}" -C "$TMPDIR"
 
+	ensure_install_dir
 	echo "Installing to ${INSTALL_DIR}..."
-	if [ -w "$INSTALL_DIR" ]; then
-		mv "${TMPDIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-	else
-		sudo mv "${TMPDIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-	fi
-
+	mv "${TMPDIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
 	chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
 }
 
@@ -85,13 +95,9 @@ install_with_go() {
 	TMPGOBIN=$(mktemp -d)
 	GOBIN="$TMPGOBIN" go install "${MODULE}@latest"
 
+	ensure_install_dir
 	echo "Installing to ${INSTALL_DIR}..."
-	if [ -w "$INSTALL_DIR" ]; then
-		mv "${TMPGOBIN}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-	else
-		sudo mv "${TMPGOBIN}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-	fi
-
+	mv "${TMPGOBIN}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
 	chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
 	LATEST="(go install @latest)"
 }
@@ -109,6 +115,14 @@ fi
 
 echo ""
 echo "✅ ${BINARY_NAME} ${LATEST} installed to ${INSTALL_DIR}/${BINARY_NAME}"
+case ":${PATH}:" in
+	*":${INSTALL_DIR}:"*) ;;
+	*)
+		echo ""
+		echo "Add this directory to your PATH if needed, e.g.:"
+		echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
+		;;
+esac
 echo ""
 echo "Get started:"
 echo "  ${BINARY_NAME}              # Launch dashboard TUI"

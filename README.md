@@ -12,6 +12,8 @@ A TUI for bootstrapping developers into curated Claude Code plugin sets organize
 curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/master/scripts/install.sh | sh
 ```
 
+By default the binary is installed to `~/.local/bin` (created if needed). Override with `ASDS_INSTALL_DIR` if you want another location. Ensure that directory is on your `PATH` (many distros already include `~/.local/bin`).
+
 If that command fails with **404**, GitHub is not serving that URL (common causes: repo is private, not pushed yet, or lives under a different `org/repo`). Fix it by publishing `scripts/install.sh` on the default branch and making the repo public, **or** install from a checkout:
 
 ```sh
