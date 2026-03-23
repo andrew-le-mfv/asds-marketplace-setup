@@ -46,11 +46,9 @@ func (m Model) viewRoleSelect() string {
 
 	help := styles.HelpStyle.Render("↑↓ navigate  enter select")
 
-	content := lipgloss.JoinVertical(lipgloss.Left,
+	return lipgloss.JoinVertical(lipgloss.Left,
 		append([]string{"", title, subtitle, ""}, append(items, "", help)...)...,
 	)
-
-	return styles.BoxStyle.Render(content)
 }
 
 func (m Model) viewScopeSelect() string {
@@ -71,11 +69,9 @@ func (m Model) viewScopeSelect() string {
 
 	help := styles.HelpStyle.Render("↑↓ navigate  enter select  esc back")
 
-	content := lipgloss.JoinVertical(lipgloss.Left,
+	return lipgloss.JoinVertical(lipgloss.Left,
 		append([]string{"", title, roleLine, ""}, append(items, "", help)...)...,
 	)
-
-	return styles.BoxStyle.Render(content)
 }
 
 func (m Model) viewConfirm() string {
@@ -105,18 +101,17 @@ func (m Model) viewConfirm() string {
 	lines = append(lines, "")
 	lines = append(lines, styles.HelpStyle.Render("enter/y confirm  esc/n go back"))
 
-	return styles.BoxStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lines...))
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
 func (m Model) viewInstalling() string {
-	content := lipgloss.JoinVertical(lipgloss.Left,
+	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
 		styles.TitleStyle.Render("Installing..."),
 		"",
 		styles.SubtitleStyle.Render("Setting up ASDS plugins for "+m.roles[m.selectedRole].DisplayName),
 		"",
 	)
-	return styles.BoxStyle.Render(content)
 }
 
 func (m Model) viewComplete() string {
@@ -136,13 +131,13 @@ func (m Model) viewComplete() string {
 	lines = append(lines, "")
 	lines = append(lines, styles.HelpStyle.Render("enter to continue"))
 
-	return styles.BoxStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lines...))
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
 func (m Model) viewError() string {
 	title := styles.ErrorStyle.Render("❌ Installation Failed")
 
-	content := lipgloss.JoinVertical(lipgloss.Left,
+	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
 		title,
 		"",
@@ -150,6 +145,4 @@ func (m Model) viewError() string {
 		"",
 		styles.HelpStyle.Render("enter to go back"),
 	)
-
-	return styles.BoxStyle.Render(content)
 }

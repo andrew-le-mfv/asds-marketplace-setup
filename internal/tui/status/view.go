@@ -38,5 +38,5 @@ func (m Model) View() string {
 		}
 	}
 
-	return styles.BoxStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lines...))
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }

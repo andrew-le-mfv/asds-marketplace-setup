@@ -28,5 +28,5 @@ func (m Model) View() string {
 	lines = append(lines, styles.HelpStyle.Render("Config location: ~/.config/asds/config.yaml"))
 	lines = append(lines, styles.HelpStyle.Render("Precedence: CLI flags > env vars > config file > defaults"))
 
-	return styles.BoxStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lines...))
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }

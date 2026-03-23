@@ -27,7 +27,7 @@ var (
 	HeaderStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(Primary).
-			Padding(0, 1)
+			Padding(1, 2)
 
 	TitleStyle = lipgloss.NewStyle().
 			Bold(true).

@@ -96,6 +96,27 @@ func (a App) View() string {
 	content := a.renderContent()
 	footer := a.renderFooter()
 
+	if a.width > 0 && a.height > 0 {
+		headerHeight := lipgloss.Height(header)
+		tabBarHeight := lipgloss.Height(tabBar)
+		footerHeight := lipgloss.Height(footer)
+		contentHeight := a.height - headerHeight - tabBarHeight - footerHeight
+
+		// BoxStyle has border (1+1) and padding (1 top/bottom, 2 left/right).
+		boxW := a.width - 6
+		boxH := contentHeight - 4
+		if boxH < 1 {
+			boxH = 1
+		}
+		content = styles.BoxStyle.
+			Width(boxW).
+			Height(boxH).
+			Render(content)
+
+		// Center the box in the remaining space.
+		content = lipgloss.Place(a.width, contentHeight, lipgloss.Center, lipgloss.Center, content)
+	}
+
 	return lipgloss.JoinVertical(lipgloss.Left,
 		header,
 		tabBar,
@@ -105,7 +126,19 @@ func (a App) View() string {
 }
 
 func (a App) renderHeader() string {
-	return styles.HeaderStyle.Render("🚀 ASDS — Agentic Software Development Suite")
+	logo := styles.HeaderStyle.Render("🚀  A S D S")
+	subtitle := lipgloss.NewStyle().
+		Foreground(styles.TextDim).
+		Render("Agentic Software Development Suite")
+	title := lipgloss.JoinVertical(lipgloss.Center, logo, subtitle)
+	if a.width > 0 {
+		return lipgloss.NewStyle().
+			Padding(2, 0, 1, 0).
+			Width(a.width).
+			Align(lipgloss.Center).
+			Render(title)
+	}
+	return title
 }
 
 func (a App) renderTabBar() string {
@@ -118,7 +151,15 @@ func (a App) renderTabBar() string {
 			tabs = append(tabs, styles.InactiveTabStyle.Render(label))
 		}
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, tabs...)
+	bar := lipgloss.JoinHorizontal(lipgloss.Top, tabs...)
+	if a.width > 0 {
+		return lipgloss.NewStyle().
+			Width(a.width).
+			Align(lipgloss.Center).
+			Padding(1, 0, 0, 0).
+			Render(bar)
+	}
+	return bar
 }
 
 func (a App) renderContent() string {

@@ -38,5 +38,5 @@ func (m Model) View() string {
 
 	lines = append(lines, "", styles.HelpStyle.Render("↑↓ navigate"))
 
-	return styles.BoxStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lines...))
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
