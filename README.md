@@ -6,11 +6,23 @@ A TUI for bootstrapping developers into curated Claude Code plugin sets organize
 
 ### Install
 
+**One-liner** (requires a [public](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility) repo so `raw.githubusercontent.com` can serve the script):
+
 ```sh
 curl -fsSL https://raw.githubusercontent.com/andrew-le-mfv/asds-marketplace-setup/master/scripts/install.sh | sh
 ```
 
-Or download a binary from [GitHub Releases](https://github.com/andrew-le-mfv/asds-marketplace-setup/releases).
+If that command fails with **404**, GitHub is not serving that URL (common causes: repo is private, not pushed yet, or lives under a different `org/repo`). Fix it by publishing `scripts/install.sh` on the default branch and making the repo public, **or** install from a checkout:
+
+```sh
+git clone https://github.com/andrew-le-mfv/asds-marketplace-setup.git
+cd asds-marketplace-setup
+sh scripts/install.sh
+```
+
+The script downloads a release asset when [GitHub Releases](https://github.com/andrew-le-mfv/asds-marketplace-setup/releases) exist; if there are none yet, it falls back to `go install` when Go is on your `PATH`.
+
+To ship binaries for everyone without requiring Go, tag a version and run [GoReleaser](https://goreleaser.com/) (see `.goreleaser.yaml` in this repo).
 
 ### Usage
 
