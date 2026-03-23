@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
@@ -22,15 +20,12 @@ func NewRootCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			projectRoot, _ := claude.FindProjectRoot(".")
 
-			asdsCfg, _ := config.ReadASDSConfig(config.ResolveASDSConfigPath())
-			mktCfg, err := registry.FetchOrDefault(asdsCfg.MarketplaceURL)
-			if err != nil {
-				return fmt.Errorf("loading marketplace config: %w", err)
-			}
+			mktsCfgPath := config.ResolveMarketplacesConfigPath()
+			allCfgs := registry.LoadAllMarketplaces(mktsCfgPath, projectRoot)
 
-			app := tui.NewApp(version, mktCfg, projectRoot)
+			app := tui.NewApp(version, allCfgs, projectRoot)
 			p := tea.NewProgram(app, tea.WithAltScreen())
-			_, err = p.Run()
+			_, err := p.Run()
 			return err
 		},
 	}
@@ -42,6 +37,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newUpdateCmd())
 	cmd.AddCommand(newStatusCmd())
 	cmd.AddCommand(newResetCmd())
+	cmd.AddCommand(newMarketplaceCmd())
 
 	return cmd
 }

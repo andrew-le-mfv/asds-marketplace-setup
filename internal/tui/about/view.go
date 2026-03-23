@@ -38,7 +38,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) View() string {
 	title := styles.TitleStyle.Render("🚀 ASDS — Agentic Software Development Suite")
 
-	info := lipgloss.JoinVertical(lipgloss.Left,
+	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
 		title,
 		"",
@@ -50,6 +50,4 @@ func (m Model) View() string {
 		styles.HelpStyle.Render("GitHub: github.com/andrew-le-mfv/asds-marketplace-setup"),
 		styles.HelpStyle.Render("Docs:   https://your-org.github.io/asds-marketplace-setup"),
 	)
-
-	return styles.BoxStyle.Render(info)
 }

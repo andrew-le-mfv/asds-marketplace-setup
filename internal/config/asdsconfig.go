@@ -8,18 +8,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const defaultMarketplaceURL = "github.com/your-org/asds-marketplace"
-
 // ASDSConfig is the TUI's own configuration stored at ~/.config/asds/config.yaml.
 type ASDSConfig struct {
-	MarketplaceURL string `yaml:"marketplace_url"`
+	// Future non-marketplace settings go here.
 }
 
 // DefaultASDSConfig returns the default ASDS configuration.
 func DefaultASDSConfig() ASDSConfig {
-	return ASDSConfig{
-		MarketplaceURL: defaultMarketplaceURL,
-	}
+	return ASDSConfig{}
 }
 
 // ResolveASDSConfigPath returns the path to ~/.config/asds/config.yaml.

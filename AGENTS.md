@@ -1,11 +1,13 @@
-# ASDS Marketplace Setup
+# AGENTS.md — ASDS Marketplace Setup
 
-> Guidance for Claude Code (claude.ai/code) when working with this repository.
+> Guidance for AI coding agents when working with this repository.
 
 ## Project Overview
-This is a Go TUI application that bootstraps developers into the ASDS (Agentic Software Development Suite).
+
+Go TUI application (Bubble Tea + Cobra) that bootstraps developers into ASDS (Agentic Software Development Suite).
 
 ## Build & Test
+
 - Build: `go build -o bin/asds ./cmd/asds/` or `make build`
 - Run: `go run ./cmd/asds/` or `make run`
 - Test: `go test ./...` or `make test`
@@ -16,13 +18,15 @@ This is a Go TUI application that bootstraps developers into the ASDS (Agentic S
 - Lint: `make lint` (requires golangci-lint)
 
 ## Code Style
+
 - Follow standard Go conventions (gofmt, go vet)
 - Use `internal/` for private packages, `pkg/` for public
 - Error messages: lowercase, no trailing punctuation
 - Error wrapping: use `fmt.Errorf("...: %w", err)`
-- Test files: `*_test.go` in the same package (or `_test` suffix package for black-box)
+- Test files: `*_test.go` in the same package (or `_test` suffix for black-box)
 
 ## Architecture
+
 - `cmd/asds/main.go` — entry point
 - `internal/commands/` — Cobra CLI commands
 - `internal/config/` — marketplace config, manifest, ASDS config
@@ -33,6 +37,7 @@ This is a Go TUI application that bootstraps developers into the ASDS (Agentic S
 - `configs/` — embedded default marketplace YAML
 
 ## Key Patterns
+
 - Installer interface with Direct and CLI implementations
 - CLAUDE.md marker blocks: `<!-- ASDS:BEGIN role=X -->` / `<!-- ASDS:END -->`
 - Settings JSON merge (never overwrite unrelated keys)

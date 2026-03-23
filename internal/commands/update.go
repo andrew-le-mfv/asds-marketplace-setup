@@ -45,15 +45,20 @@ func newUpdateCmd() *cobra.Command {
 				return fmt.Errorf("no ASDS installation found for scope %q", scope)
 			}
 
-			asdsCfg, _ := config.ReadASDSConfig(config.ResolveASDSConfigPath())
-			mktCfg, err := registry.FetchOrDefault(asdsCfg.MarketplaceURL)
-			if err != nil {
-				return fmt.Errorf("loading marketplace config: %w", err)
-			}
+			mktsCfgPath := config.ResolveMarketplacesConfigPath()
+			allCfgs := registry.LoadAllMarketplaces(mktsCfgPath, projectRoot)
 
-			roleConfig, ok := mktCfg.Roles[manifest.Role]
-			if !ok {
-				return fmt.Errorf("role %q no longer exists in marketplace", manifest.Role)
+			var mktCfg *config.MarketplaceConfig
+			var roleConfig config.Role
+			for _, cfg := range allCfgs {
+				if r, ok := cfg.Roles[manifest.Role]; ok {
+					mktCfg = cfg
+					roleConfig = r
+					break
+				}
+			}
+			if mktCfg == nil {
+				return fmt.Errorf("role %q no longer exists in any marketplace", manifest.Role)
 			}
 
 			currentRefs := make(map[string]bool)
