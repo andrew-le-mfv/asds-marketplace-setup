@@ -92,7 +92,7 @@ func (m Model) updateDetail(msg tea.KeyMsg) (Model, tea.Cmd) {
 	_, installed := m.installedPlugins[plugin.Source]
 
 	switch msg.String() {
-	case "i":
+	case "enter":
 		m.selectedScope = 0
 		m.step = StepScopeSelect
 	case "d":

@@ -52,9 +52,6 @@ func (m Model) viewBrowse() string {
 		}
 
 		badge := ""
-		if item.Required {
-			badge += styles.WarningStyle.Render(" [required]")
-		}
 		if info, ok := m.installedPlugins[item.Source]; ok {
 			badge += styles.SuccessStyle.Render(fmt.Sprintf(" ✓ installed [%s]", info.Scope))
 		}
@@ -90,16 +87,12 @@ func (m Model) viewDetail() string {
 	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Source:   %s", plugin.Source)))
 	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Role:     %s", plugin.RoleName)))
 
-	if plugin.Required {
-		lines = append(lines, styles.WarningStyle.Render("  Required: yes"))
-	}
-
 	lines = append(lines, "")
 
 	if installed {
-		lines = append(lines, styles.HelpStyle.Render("i install to scope  d uninstall  esc back"))
+		lines = append(lines, styles.HelpStyle.Render("enter reinstall  d uninstall  esc back"))
 	} else {
-		lines = append(lines, styles.HelpStyle.Render("i install  esc back"))
+		lines = append(lines, styles.HelpStyle.Render("enter install  esc back"))
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)

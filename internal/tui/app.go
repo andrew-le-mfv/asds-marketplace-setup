@@ -192,7 +192,7 @@ func (a App) renderContent() string {
 func (a App) renderFooter() string {
 	keys := []string{
 		"↑↓ navigate",
-		"tab/shift+tab switch",
+		"←→/tab switch",
 		"enter select",
 		"q quit",
 	}
