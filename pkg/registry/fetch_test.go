@@ -89,6 +89,59 @@ func TestFetchMarketplaceConfig_Errors(t *testing.T) {
 	}
 }
 
+func TestDiscoverMarketplace(t *testing.T) {
+	yamlContent := `
+schema_version: 1
+marketplace:
+  name: "discovered"
+  description: "Test"
+  version: "1.0.0"
+  registry_url: "github.com/test"
+roles:
+  dev:
+    display_name: "Dev"
+    description: "Dev"
+    plugins:
+      - name: "p"
+        source: "p@test"
+        required: true
+defaults:
+  scope: project
+`
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/yaml")
+		w.Write([]byte(yamlContent))
+	}))
+	defer server.Close()
+
+	cfg, err := registry.DiscoverMarketplace(server.URL, "")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Marketplace.Name != "discovered" {
+		t.Errorf("name = %q, want %q", cfg.Marketplace.Name, "discovered")
+	}
+}
+
+func TestDiscoverMarketplace_InvalidURL(t *testing.T) {
+	_, err := registry.DiscoverMarketplace("http://localhost:1", "")
+	if err == nil {
+		t.Error("expected error for unreachable URL")
+	}
+}
+
+func TestDiscoverMarketplace_InvalidResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("not yaml at all {{{"))
+	}))
+	defer server.Close()
+
+	_, err := registry.DiscoverMarketplace(server.URL, "")
+	if err == nil {
+		t.Error("expected error for invalid YAML")
+	}
+}
+
 func TestBuildRawURL(t *testing.T) {
 	tests := []struct {
 		input string
@@ -96,7 +149,11 @@ func TestBuildRawURL(t *testing.T) {
 	}{
 		{
 			"github.com/your-org/asds-marketplace",
-			"https://raw.githubusercontent.com/your-org/asds-marketplace/master/asds-marketplace.yaml",
+			"https://raw.githubusercontent.com/your-org/asds-marketplace/main/asds-marketplace.yaml",
+		},
+		{
+			"https://github.com/your-org/asds-marketplace",
+			"https://raw.githubusercontent.com/your-org/asds-marketplace/main/asds-marketplace.yaml",
 		},
 		{
 			"https://example.com/config.yaml",

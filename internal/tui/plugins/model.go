@@ -24,10 +24,11 @@ const (
 
 // PluginItem represents a plugin in the browser list.
 type PluginItem struct {
-	Name     string
-	Source   string
-	Required bool
-	RoleName string
+	Name            string
+	Source          string
+	Required        bool
+	RoleName        string
+	MarketplaceName string
 }
 
 // installedScope tracks which scope a plugin is installed in.
@@ -44,41 +45,44 @@ type scopeItem struct {
 
 // Model holds the plugin browser state.
 type Model struct {
-	step           Step
-	items          []PluginItem
-	cursor         int
-	selectedScope  int
-	scopes         []scopeItem
-	width          int
-	height         int
-	projectRoot    string
-	marketplaceCfg *config.MarketplaceConfig
-	installResults []installer.InstallResult
-	uninstResults  []installer.InstallResult
-	errorMsg       string
+	step            Step
+	items           []PluginItem
+	cursor          int
+	selectedScope   int
+	scopes          []scopeItem
+	width           int
+	height          int
+	projectRoot     string
+	marketplaceCfgs []*config.MarketplaceConfig
+	installResults  []installer.InstallResult
+	uninstResults   []installer.InstallResult
+	errorMsg        string
 
 	// installedPlugins maps plugin source to the scope it's installed in.
 	installedPlugins map[string]installedScope
 }
 
-// New creates a plugin browser from a marketplace config.
-func New(cfg *config.MarketplaceConfig, projectRoot string) Model {
+// New creates a plugin browser from marketplace configs.
+func New(cfgs []*config.MarketplaceConfig, projectRoot string) Model {
 	seen := make(map[string]bool)
 	var items []PluginItem
 
-	for _, roleName := range cfg.RoleNames() {
-		role := cfg.Roles[roleName]
-		for _, p := range role.Plugins {
-			if seen[p.Source] {
-				continue
+	for _, cfg := range cfgs {
+		for _, roleName := range cfg.RoleNames() {
+			role := cfg.Roles[roleName]
+			for _, p := range role.Plugins {
+				if seen[p.Source] {
+					continue
+				}
+				seen[p.Source] = true
+				items = append(items, PluginItem{
+					Name:            p.Name,
+					Source:          p.Source,
+					Required:        p.Required,
+					RoleName:        roleName,
+					MarketplaceName: cfg.Marketplace.Name,
+				})
 			}
-			seen[p.Source] = true
-			items = append(items, PluginItem{
-				Name:     p.Name,
-				Source:   p.Source,
-				Required: p.Required,
-				RoleName: roleName,
-			})
 		}
 	}
 
@@ -89,11 +93,11 @@ func New(cfg *config.MarketplaceConfig, projectRoot string) Model {
 	}
 
 	m := Model{
-		step:           StepBrowse,
-		items:          items,
-		scopes:         scopes,
-		projectRoot:    projectRoot,
-		marketplaceCfg: cfg,
+		step:            StepBrowse,
+		items:           items,
+		scopes:          scopes,
+		projectRoot:     projectRoot,
+		marketplaceCfgs: cfgs,
 	}
 	m.RefreshInstalled()
 	return m
@@ -113,6 +117,37 @@ func (m Model) SelectedScope() config.Scope {
 		return m.scopes[m.selectedScope].Scope
 	}
 	return config.ScopeProject
+}
+
+// RefreshMarketplaces reloads marketplace configs and rebuilds the plugin items list.
+func (m *Model) RefreshMarketplaces(cfgs []*config.MarketplaceConfig) {
+	m.marketplaceCfgs = cfgs
+
+	seen := make(map[string]bool)
+	var items []PluginItem
+	for _, cfg := range cfgs {
+		for _, roleName := range cfg.RoleNames() {
+			role := cfg.Roles[roleName]
+			for _, p := range role.Plugins {
+				if seen[p.Source] {
+					continue
+				}
+				seen[p.Source] = true
+				items = append(items, PluginItem{
+					Name:            p.Name,
+					Source:          p.Source,
+					Required:        p.Required,
+					RoleName:        roleName,
+					MarketplaceName: cfg.Marketplace.Name,
+				})
+			}
+		}
+	}
+	m.items = items
+	if m.cursor >= len(m.items) {
+		m.cursor = max(0, len(m.items)-1)
+	}
+	m.RefreshInstalled()
 }
 
 // RefreshInstalled rescans all scopes' settings files to find enabled plugins.

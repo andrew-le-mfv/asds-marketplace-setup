@@ -14,6 +14,7 @@ import (
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/setup"
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/status"
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
+	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
 // App is the root Bubble Tea model for the ASDS dashboard.
@@ -24,6 +25,10 @@ type App struct {
 	width     int
 	height    int
 
+	// Used to reload marketplace configs on tab switch.
+	mktsCfgPath string
+	projectRoot string
+
 	// Tab models
 	setupModel   setup.Model
 	pluginsModel plugins.Model
@@ -33,13 +38,15 @@ type App struct {
 }
 
 // NewApp creates a new App model.
-func NewApp(version string, cfg *config.MarketplaceConfig, projectRoot string) App {
+func NewApp(version string, cfgs []*config.MarketplaceConfig, projectRoot string) App {
 	return App{
 		activeTab:    TabSetup,
 		tabs:         AllTabs(),
 		keys:         DefaultKeyMap(),
-		setupModel:   setup.New(cfg, projectRoot),
-		pluginsModel: plugins.New(cfg, projectRoot),
+		mktsCfgPath:  config.ResolveMarketplacesConfigPath(),
+		projectRoot:  projectRoot,
+		setupModel:   setup.New(cfgs, projectRoot),
+		pluginsModel: plugins.New(cfgs, projectRoot),
 		configModel:  tuiconfig.New(),
 		statusModel:  status.New(projectRoot),
 		aboutModel:   about.New(version),
@@ -55,14 +62,17 @@ func (a App) Init() tea.Cmd {
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		// When config tab has a text input active, don't intercept keys for tab switching.
+		configFormActive := a.activeTab == TabConfig && a.configModel.InForm()
+
 		switch {
-		case key.Matches(msg, a.keys.Quit):
+		case key.Matches(msg, a.keys.Quit) && !configFormActive:
 			return a, tea.Quit
-		case key.Matches(msg, a.keys.NextTab):
+		case key.Matches(msg, a.keys.NextTab) && !configFormActive:
 			a.activeTab = TabID((int(a.activeTab) + 1) % TabCount())
 			a.onTabSwitch()
 			return a, nil
-		case key.Matches(msg, a.keys.PrevTab):
+		case key.Matches(msg, a.keys.PrevTab) && !configFormActive:
 			a.activeTab = TabID((int(a.activeTab) - 1 + TabCount()) % TabCount())
 			a.onTabSwitch()
 			return a, nil
@@ -167,8 +177,12 @@ func (a App) renderTabBar() string {
 // onTabSwitch refreshes tab state when switching to it.
 func (a *App) onTabSwitch() {
 	switch a.activeTab {
+	case TabSetup:
+		cfgs := registry.LoadAllMarketplaces(a.mktsCfgPath, a.projectRoot)
+		a.setupModel.RefreshMarketplaces(cfgs)
 	case TabPlugins:
-		a.pluginsModel.RefreshInstalled()
+		cfgs := registry.LoadAllMarketplaces(a.mktsCfgPath, a.projectRoot)
+		a.pluginsModel.RefreshMarketplaces(cfgs)
 	}
 }
 

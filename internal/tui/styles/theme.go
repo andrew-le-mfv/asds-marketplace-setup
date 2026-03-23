@@ -84,4 +84,8 @@ var (
 
 	HelpStyle = lipgloss.NewStyle().
 			Foreground(Muted)
+
+	AccentStyle = lipgloss.NewStyle().
+			Foreground(Secondary).
+			Bold(true)
 )

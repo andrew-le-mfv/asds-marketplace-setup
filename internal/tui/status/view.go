@@ -137,5 +137,3 @@ func (m Model) viewResult() string {
 
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
-
-

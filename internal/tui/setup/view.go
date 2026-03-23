@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/tui/styles"
 )
 
@@ -54,7 +55,7 @@ func (m Model) viewRoleSelect() string {
 			badge = styles.SuccessStyle.Render(fmt.Sprintf(" ✓ installed [%s]", info.Scope))
 		}
 
-		line := fmt.Sprintf("%s%s — %s (%d plugins)%s", cursor, r.DisplayName, r.Description, r.PluginCount, badge)
+		line := fmt.Sprintf("%s%s — %s (%d plugins) [%s]%s", cursor, r.DisplayName, r.Description, r.PluginCount, r.MarketplaceName, badge)
 		items = append(items, style.Render(line))
 	}
 
@@ -67,7 +68,13 @@ func (m Model) viewRoleSelect() string {
 
 func (m Model) viewRoleDetail() string {
 	roleID := m.SelectedRoleID()
-	role := m.marketplaceCfg.Roles[roleID]
+	var role config.Role
+	for _, cfg := range m.marketplaceCfgs {
+		if cfg.Marketplace.Name == m.roles[m.selectedRole].MarketplaceName {
+			role = cfg.Roles[roleID]
+			break
+		}
+	}
 	info := m.installedRoles[roleID]
 	manifest := info.Manifest
 
@@ -91,7 +98,13 @@ func (m Model) viewRoleDetail() string {
 
 func (m Model) viewUninstallConfirm() string {
 	roleID := m.SelectedRoleID()
-	role := m.marketplaceCfg.Roles[roleID]
+	var role config.Role
+	for _, cfg := range m.marketplaceCfgs {
+		if cfg.Marketplace.Name == m.roles[m.selectedRole].MarketplaceName {
+			role = cfg.Roles[roleID]
+			break
+		}
+	}
 	info := m.installedRoles[roleID]
 
 	title := styles.WarningStyle.Render("⚠ Confirm Uninstall")
@@ -168,7 +181,13 @@ func (m Model) viewScopeSelect() string {
 
 func (m Model) viewConfirm() string {
 	roleID := m.SelectedRoleID()
-	role := m.marketplaceCfg.Roles[roleID]
+	var role config.Role
+	for _, cfg := range m.marketplaceCfgs {
+		if cfg.Marketplace.Name == m.roles[m.selectedRole].MarketplaceName {
+			role = cfg.Roles[roleID]
+			break
+		}
+	}
 	scope := m.SelectedScope()
 
 	title := styles.TitleStyle.Render("Confirm installation")

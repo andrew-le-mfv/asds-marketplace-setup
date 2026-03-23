@@ -38,28 +38,49 @@ func (m Model) View() string {
 
 func (m Model) viewBrowse() string {
 	title := styles.TitleStyle.Render("📦 Available Plugins")
-	subtitle := styles.SubtitleStyle.Render("Browse and manage plugins from the marketplace")
+	subtitle := styles.SubtitleStyle.Render("Browse and manage plugins from all marketplaces")
 
 	var lines []string
 	lines = append(lines, "", title, subtitle, "")
 
-	for i, item := range m.items {
-		cursor := "  "
-		style := styles.NormalStyle
-		if i == m.cursor {
-			cursor = "▸ "
-			style = styles.SelectedStyle
-		}
+	if len(m.items) == 0 {
+		lines = append(lines, styles.WarningStyle.Render("  No plugins found. Add a marketplace in the Config tab."))
+	} else {
+		currentMarketplace := ""
+		for i, item := range m.items {
+			// Show marketplace group header when marketplace changes.
+			if item.MarketplaceName != currentMarketplace {
+				if currentMarketplace != "" {
+					lines = append(lines, "") // spacing between groups
+				}
+				currentMarketplace = item.MarketplaceName
+				header := fmt.Sprintf("  ── %s ──", currentMarketplace)
+				lines = append(lines, styles.AccentStyle.Render(header))
+			}
 
-		badge := ""
-		if info, ok := m.installedPlugins[item.Source]; ok {
-			badge += styles.SuccessStyle.Render(fmt.Sprintf(" ✓ installed [%s]", info.Scope))
-		}
+			cursor := "  "
+			style := styles.NormalStyle
+			if i == m.cursor {
+				cursor = "▸ "
+				style = styles.SelectedStyle
+			}
 
-		line := fmt.Sprintf("%s%s%s", cursor, item.Name, badge)
-		lines = append(lines, style.Render(line))
-		if i == m.cursor {
-			lines = append(lines, styles.SubtitleStyle.Render(fmt.Sprintf("    Source: %s | Role: %s", item.Source, item.RoleName)))
+			badge := ""
+			if info, ok := m.installedPlugins[item.Source]; ok {
+				badge += styles.SuccessStyle.Render(fmt.Sprintf(" ✓ installed [%s]", info.Scope))
+			}
+
+			roleHint := ""
+			if item.RoleName != "" && item.RoleName != "default" {
+				roleHint = styles.SubtitleStyle.Render(fmt.Sprintf(" [%s]", item.RoleName))
+			}
+
+			line := fmt.Sprintf("%s%s%s%s", cursor, item.Name, roleHint, badge)
+			lines = append(lines, style.Render(line))
+			if i == m.cursor {
+				lines = append(lines, styles.SubtitleStyle.Render(
+					fmt.Sprintf("    Source: %s", item.Source)))
+			}
 		}
 	}
 
@@ -84,8 +105,9 @@ func (m Model) viewDetail() string {
 	}
 
 	lines = append(lines, "")
-	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Source:   %s", plugin.Source)))
-	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Role:     %s", plugin.RoleName)))
+	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Source:      %s", plugin.Source)))
+	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Role:        %s", plugin.RoleName)))
+	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Marketplace: %s", plugin.MarketplaceName)))
 
 	lines = append(lines, "")
 

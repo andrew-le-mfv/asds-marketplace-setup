@@ -151,14 +151,25 @@ func (m Model) doInstall() tea.Cmd {
 	return func() tea.Msg {
 		roleID := m.SelectedRoleID()
 		scope := m.SelectedScope()
-		roleConfig := m.marketplaceCfg.Roles[roleID]
+		// Find the correct marketplace for this role
+		var mktCfg *config.MarketplaceConfig
+		for _, cfg := range m.marketplaceCfgs {
+			if cfg.Marketplace.Name == m.roles[m.selectedRole].MarketplaceName {
+				mktCfg = cfg
+				break
+			}
+		}
+		if mktCfg == nil {
+			return InstallCompleteMsg{Error: fmt.Errorf("marketplace not found")}
+		}
+		roleConfig := mktCfg.Roles[roleID]
 
 		inst := installer.NewInstaller(true)
 
 		// Register marketplace (non-fatal if it fails)
 		inst.RegisterMarketplace(
-			m.marketplaceCfg.Marketplace.Name,
-			m.marketplaceCfg.Marketplace.RegistryURL,
+			mktCfg.Marketplace.Name,
+			mktCfg.Marketplace.RegistryURL,
 		)
 
 		// Install plugins
@@ -194,7 +205,7 @@ func (m Model) doInstall() tea.Cmd {
 			UpdatedAt:          now,
 			Role:               roleID,
 			Scope:              scope,
-			MarketplaceSource:  m.marketplaceCfg.Marketplace.RegistryURL,
+			MarketplaceSource:  mktCfg.Marketplace.RegistryURL,
 			InstallMethod:      inst.Method(),
 			ClaudeCodeDetected: installer.DetectClaudeCode().Found,
 			Plugins:            manifestPlugins,

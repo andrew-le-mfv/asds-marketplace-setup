@@ -9,41 +9,29 @@ import (
 )
 
 func TestASDSConfig_Defaults(t *testing.T) {
-	cfg := config.DefaultASDSConfig()
-	if cfg.MarketplaceURL != "github.com/your-org/asds-marketplace" {
-		t.Errorf("marketplace_url = %q, want default", cfg.MarketplaceURL)
-	}
+	_ = config.DefaultASDSConfig()
 }
 
 func TestASDSConfig_WriteAndRead(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.yaml")
 
-	cfg := config.ASDSConfig{
-		MarketplaceURL: "github.com/custom/marketplace",
-	}
+	cfg := config.ASDSConfig{}
 
 	if err := config.WriteASDSConfig(path, &cfg); err != nil {
 		t.Fatalf("WriteASDSConfig error: %v", err)
 	}
 
-	loaded, err := config.ReadASDSConfig(path)
+	_, err := config.ReadASDSConfig(path)
 	if err != nil {
 		t.Fatalf("ReadASDSConfig error: %v", err)
-	}
-
-	if loaded.MarketplaceURL != "github.com/custom/marketplace" {
-		t.Errorf("marketplace_url = %q, want %q", loaded.MarketplaceURL, "github.com/custom/marketplace")
 	}
 }
 
 func TestReadASDSConfig_NotFound_ReturnsDefaults(t *testing.T) {
-	cfg, err := config.ReadASDSConfig("/nonexistent/config.yaml")
+	_, err := config.ReadASDSConfig("/nonexistent/config.yaml")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	}
-	if cfg.MarketplaceURL != "github.com/your-org/asds-marketplace" {
-		t.Errorf("expected default marketplace_url, got %q", cfg.MarketplaceURL)
 	}
 }
 

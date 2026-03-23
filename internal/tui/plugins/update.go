@@ -152,10 +152,19 @@ func (m Model) doInstall() tea.Cmd {
 
 		inst := installer.NewInstaller(true)
 
-		inst.RegisterMarketplace(
-			m.marketplaceCfg.Marketplace.Name,
-			m.marketplaceCfg.Marketplace.RegistryURL,
-		)
+		// Find the marketplace config for this plugin
+		var mktCfg *config.MarketplaceConfig
+		for _, cfg := range m.marketplaceCfgs {
+			if cfg.Marketplace.Name == plugin.MarketplaceName {
+				mktCfg = cfg
+				break
+			}
+		}
+		if mktCfg == nil {
+			return InstallCompleteMsg{Error: fmt.Errorf("marketplace %q not found", plugin.MarketplaceName)}
+		}
+
+		inst.RegisterMarketplace(mktCfg.Marketplace.Name, mktCfg.Marketplace.RegistryURL)
 
 		pluginRef := config.PluginRef{
 			Name:     plugin.Name,

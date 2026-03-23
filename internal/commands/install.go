@@ -50,22 +50,24 @@ func newInstallCmd() *cobra.Command {
 				return fmt.Errorf("no project root found; use --project-root or run from a git repository")
 			}
 
-			// Load ASDS config for marketplace URL
-			asdsCfg, err := config.ReadASDSConfig(config.ResolveASDSConfigPath())
-			if err != nil {
-				return fmt.Errorf("reading ASDS config: %w", err)
-			}
+			// Load all marketplaces
+			mktsCfgPath := config.ResolveMarketplacesConfigPath()
+			allCfgs := registry.LoadAllMarketplaces(mktsCfgPath, projectRoot)
 
-			// Fetch marketplace config
-			mktCfg, err := registry.FetchOrDefault(asdsCfg.MarketplaceURL)
-			if err != nil {
-				return fmt.Errorf("loading marketplace config: %w", err)
+			// Find role across all marketplaces
+			var mktCfg *config.MarketplaceConfig
+			var roleConfig config.Role
+			var found bool
+			for _, cfg := range allCfgs {
+				if r, ok := cfg.Roles[role]; ok {
+					mktCfg = cfg
+					roleConfig = r
+					found = true
+					break
+				}
 			}
-
-			// Validate role exists
-			roleConfig, ok := mktCfg.Roles[role]
-			if !ok {
-				return fmt.Errorf("unknown role %q; available roles: %v", role, mktCfg.RoleNames())
+			if !found {
+				return fmt.Errorf("unknown role %q across all marketplaces", role)
 			}
 
 			// Show confirmation

@@ -21,7 +21,8 @@ func TestDefaultMarketplaceConfig(t *testing.T) {
 
 	expectedRoles := []string{
 		"backend", "data-engineer", "developer", "devops",
-		"frontend", "pm", "security", "techlead", "tester",
+		"frontend", "go-developer", "plugin-developer", "pm",
+		"rust-developer", "security", "techlead", "tester",
 	}
 	names := cfg.RoleNames()
 	if len(names) != len(expectedRoles) {

@@ -30,28 +30,29 @@ type installedInfo struct {
 
 // Model holds the setup wizard state.
 type Model struct {
-	step           Step
-	roles          []roleItem
-	selectedRole   int
-	scopes         []scopeItem
-	selectedScope  int
-	marketplaceCfg *config.MarketplaceConfig
-	projectRoot    string
-	installResults []installer.InstallResult
-	uninstResults  []installer.InstallResult
-	errorMsg       string
-	width          int
-	height         int
+	step            Step
+	roles           []roleItem
+	selectedRole    int
+	scopes          []scopeItem
+	selectedScope   int
+	marketplaceCfgs []*config.MarketplaceConfig
+	projectRoot     string
+	installResults  []installer.InstallResult
+	uninstResults   []installer.InstallResult
+	errorMsg        string
+	width           int
+	height          int
 
 	// installedRoles maps roleID to its installation info.
 	installedRoles map[string]installedInfo
 }
 
 type roleItem struct {
-	ID          string
-	DisplayName string
-	Description string
-	PluginCount int
+	ID              string
+	DisplayName     string
+	Description     string
+	PluginCount     int
+	MarketplaceName string
 }
 
 type scopeItem struct {
@@ -61,16 +62,26 @@ type scopeItem struct {
 }
 
 // New creates a new setup wizard model.
-func New(cfg *config.MarketplaceConfig, projectRoot string) Model {
-	roles := make([]roleItem, 0, len(cfg.Roles))
-	for _, name := range cfg.RoleNames() {
-		r := cfg.Roles[name]
-		roles = append(roles, roleItem{
-			ID:          name,
-			DisplayName: r.DisplayName,
-			Description: r.Description,
-			PluginCount: len(r.Plugins),
-		})
+func New(cfgs []*config.MarketplaceConfig, projectRoot string) Model {
+	var roles []roleItem
+	seen := make(map[string]bool)
+
+	for _, cfg := range cfgs {
+		for _, name := range cfg.RoleNames() {
+			key := cfg.Marketplace.Name + ":" + name
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			r := cfg.Roles[name]
+			roles = append(roles, roleItem{
+				ID:              name,
+				DisplayName:     r.DisplayName,
+				Description:     r.Description,
+				PluginCount:     len(r.Plugins),
+				MarketplaceName: cfg.Marketplace.Name,
+			})
+		}
 	}
 
 	scopes := []scopeItem{
@@ -80,12 +91,12 @@ func New(cfg *config.MarketplaceConfig, projectRoot string) Model {
 	}
 
 	m := Model{
-		step:           StepRoleSelect,
-		roles:          roles,
-		scopes:         scopes,
-		marketplaceCfg: cfg,
-		projectRoot:    projectRoot,
-		installedRoles: make(map[string]installedInfo),
+		step:            StepRoleSelect,
+		roles:           roles,
+		scopes:          scopes,
+		marketplaceCfgs: cfgs,
+		projectRoot:     projectRoot,
+		installedRoles:  make(map[string]installedInfo),
 	}
 	m.refreshInstalled()
 	return m
@@ -105,6 +116,36 @@ func (m Model) SelectedScope() config.Scope {
 		return m.scopes[m.selectedScope].Scope
 	}
 	return config.ScopeProject
+}
+
+// RefreshMarketplaces reloads marketplace configs and rebuilds the roles list.
+func (m *Model) RefreshMarketplaces(cfgs []*config.MarketplaceConfig) {
+	m.marketplaceCfgs = cfgs
+
+	seen := make(map[string]bool)
+	var roles []roleItem
+	for _, cfg := range cfgs {
+		for _, name := range cfg.RoleNames() {
+			key := cfg.Marketplace.Name + ":" + name
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			r := cfg.Roles[name]
+			roles = append(roles, roleItem{
+				ID:              name,
+				DisplayName:     r.DisplayName,
+				Description:     r.Description,
+				PluginCount:     len(r.Plugins),
+				MarketplaceName: cfg.Marketplace.Name,
+			})
+		}
+	}
+	m.roles = roles
+	if m.selectedRole >= len(m.roles) {
+		m.selectedRole = max(0, len(m.roles)-1)
+	}
+	m.refreshInstalled()
 }
 
 // refreshInstalled scans all scopes for manifests and updates installedRoles.
