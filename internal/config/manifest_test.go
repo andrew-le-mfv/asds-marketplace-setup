@@ -13,7 +13,7 @@ func TestManifest_JSON_Roundtrip(t *testing.T) {
 	now := time.Date(2026, 3, 18, 10, 0, 0, 0, time.UTC)
 	m := config.Manifest{
 		SchemaVersion:      1,
-		ASDSVersion:        "0.1.0",
+		ASDSVersion:        "0.1.1",
 		InstalledAt:        now,
 		UpdatedAt:          now,
 		Role:               "developer",
@@ -107,7 +107,7 @@ func TestManifest_WriteAndRead(t *testing.T) {
 	now := time.Date(2026, 3, 18, 10, 0, 0, 0, time.UTC)
 	m := config.Manifest{
 		SchemaVersion:      1,
-		ASDSVersion:        "0.1.0",
+		ASDSVersion:        "0.1.1",
 		InstalledAt:        now,
 		UpdatedAt:          now,
 		Role:               "developer",

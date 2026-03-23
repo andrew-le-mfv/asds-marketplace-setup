@@ -17,8 +17,8 @@ func TestRootCmd_Version(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if !bytes.Contains(buf.Bytes(), []byte("0.1.0")) {
-		t.Errorf("version output = %q, want to contain '0.1.0'", buf.String())
+	if !bytes.Contains(buf.Bytes(), []byte("0.1.1")) {
+		t.Errorf("version output = %q, want to contain '0.1.1'", buf.String())
 	}
 }
 

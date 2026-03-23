@@ -200,7 +200,7 @@ func (m Model) doInstall() tea.Cmd {
 
 		manifest := &config.Manifest{
 			SchemaVersion:      1,
-			ASDSVersion:        "0.1.0",
+			ASDSVersion:        "0.1.1",
 			InstalledAt:        now,
 			UpdatedAt:          now,
 			Role:               roleID,

@@ -10,7 +10,7 @@ import (
 	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
-const version = "0.1.0"
+const version = "0.1.1"
 
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
