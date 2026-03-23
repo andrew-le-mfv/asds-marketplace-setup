@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/claude"
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/config"
 	"github.com/andrew-le-mfv/asds-marketplace-setup/internal/installer"
 )
@@ -15,7 +16,17 @@ const (
 	StepInstalling
 	StepComplete
 	StepError
+	StepRoleDetail
+	StepUninstallConfirm
+	StepUninstalling
+	StepUninstallComplete
 )
+
+// installedInfo tracks an installed role's manifest and scope.
+type installedInfo struct {
+	Scope    config.Scope
+	Manifest *config.Manifest
+}
 
 // Model holds the setup wizard state.
 type Model struct {
@@ -27,9 +38,13 @@ type Model struct {
 	marketplaceCfg *config.MarketplaceConfig
 	projectRoot    string
 	installResults []installer.InstallResult
+	uninstResults  []installer.InstallResult
 	errorMsg       string
 	width          int
 	height         int
+
+	// installedRoles maps roleID to its installation info.
+	installedRoles map[string]installedInfo
 }
 
 type roleItem struct {
@@ -64,13 +79,16 @@ func New(cfg *config.MarketplaceConfig, projectRoot string) Model {
 		{Scope: config.ScopeLocal, Label: "Local (private)", Description: "Install locally — .claude/settings.local.json"},
 	}
 
-	return Model{
+	m := Model{
 		step:           StepRoleSelect,
 		roles:          roles,
 		scopes:         scopes,
 		marketplaceCfg: cfg,
 		projectRoot:    projectRoot,
+		installedRoles: make(map[string]installedInfo),
 	}
+	m.refreshInstalled()
+	return m
 }
 
 // SelectedRoleID returns the currently selected role ID.
@@ -87,4 +105,19 @@ func (m Model) SelectedScope() config.Scope {
 		return m.scopes[m.selectedScope].Scope
 	}
 	return config.ScopeProject
+}
+
+// refreshInstalled scans all scopes for manifests and updates installedRoles.
+func (m *Model) refreshInstalled() {
+	m.installedRoles = make(map[string]installedInfo)
+	for _, s := range []config.Scope{config.ScopeUser, config.ScopeProject, config.ScopeLocal} {
+		mp := claude.ManifestPath(s, m.projectRoot)
+		manifest, err := config.ReadManifest(mp)
+		if err == nil && manifest.Role != "" {
+			m.installedRoles[manifest.Role] = installedInfo{
+				Scope:    s,
+				Manifest: manifest,
+			}
+		}
+	}
 }

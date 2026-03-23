@@ -23,6 +23,14 @@ func (m Model) View() string {
 		return m.viewComplete()
 	case StepError:
 		return m.viewError()
+	case StepRoleDetail:
+		return m.viewRoleDetail()
+	case StepUninstallConfirm:
+		return m.viewUninstallConfirm()
+	case StepUninstalling:
+		return m.viewUninstalling()
+	case StepUninstallComplete:
+		return m.viewUninstallComplete()
 	default:
 		return ""
 	}
@@ -40,15 +48,99 @@ func (m Model) viewRoleSelect() string {
 			cursor = "▸ "
 			style = styles.SelectedStyle
 		}
-		line := fmt.Sprintf("%s%s — %s (%d plugins)", cursor, r.DisplayName, r.Description, r.PluginCount)
+
+		badge := ""
+		if info, ok := m.installedRoles[r.ID]; ok {
+			badge = styles.SuccessStyle.Render(fmt.Sprintf(" ✓ installed [%s]", info.Scope))
+		}
+
+		line := fmt.Sprintf("%s%s — %s (%d plugins)%s", cursor, r.DisplayName, r.Description, r.PluginCount, badge)
 		items = append(items, style.Render(line))
 	}
 
-	help := styles.HelpStyle.Render("↑↓ navigate  enter select")
+	help := styles.HelpStyle.Render("↑↓ navigate  enter select/view")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		append([]string{"", title, subtitle, ""}, append(items, "", help)...)...,
 	)
+}
+
+func (m Model) viewRoleDetail() string {
+	roleID := m.SelectedRoleID()
+	role := m.marketplaceCfg.Roles[roleID]
+	info := m.installedRoles[roleID]
+	manifest := info.Manifest
+
+	title := styles.TitleStyle.Render(fmt.Sprintf("📋 %s", role.DisplayName))
+	statusLine := styles.SuccessStyle.Render(fmt.Sprintf("  ✓ Installed — scope: %s | method: %s | %s",
+		info.Scope, manifest.InstallMethod, manifest.InstalledAt.Format("2006-01-02")))
+
+	var lines []string
+	lines = append(lines, "", title, "", statusLine, "")
+	lines = append(lines, styles.NormalStyle.Render("  Plugins:"))
+
+	for _, p := range manifest.Plugins {
+		lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("    • %s", p.Name)))
+	}
+
+	lines = append(lines, "")
+	lines = append(lines, styles.HelpStyle.Render("d uninstall  i reinstall  esc back"))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
+}
+
+func (m Model) viewUninstallConfirm() string {
+	roleID := m.SelectedRoleID()
+	role := m.marketplaceCfg.Roles[roleID]
+	info := m.installedRoles[roleID]
+
+	title := styles.WarningStyle.Render("⚠ Confirm Uninstall")
+
+	var lines []string
+	lines = append(lines, "", title, "")
+	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Role:  %s", role.DisplayName)))
+	lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("  Scope: %s", info.Scope)))
+	lines = append(lines, "")
+	lines = append(lines, styles.NormalStyle.Render("  Plugins to remove:"))
+
+	for _, p := range info.Manifest.Plugins {
+		lines = append(lines, styles.NormalStyle.Render(fmt.Sprintf("    • %s", p.Name)))
+	}
+
+	lines = append(lines, "")
+	lines = append(lines, styles.HelpStyle.Render("y/enter confirm  n/esc cancel"))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
+}
+
+func (m Model) viewUninstalling() string {
+	return lipgloss.JoinVertical(lipgloss.Left,
+		"",
+		styles.TitleStyle.Render("Uninstalling..."),
+		"",
+		styles.SubtitleStyle.Render("Removing plugins for "+m.roles[m.selectedRole].DisplayName),
+		"",
+	)
+}
+
+func (m Model) viewUninstallComplete() string {
+	title := styles.SuccessStyle.Render("✅ Uninstall Complete!")
+
+	var lines []string
+	lines = append(lines, "", title, "")
+
+	for _, r := range m.uninstResults {
+		if r.Success {
+			lines = append(lines, styles.SuccessStyle.Render(fmt.Sprintf("  ✓ removed %s", r.PluginRef)))
+		} else {
+			lines = append(lines, styles.ErrorStyle.Render(fmt.Sprintf("  ✗ %s: %v", r.PluginRef, r.Error)))
+		}
+	}
+
+	lines = append(lines, "")
+	lines = append(lines, styles.HelpStyle.Render("enter to continue"))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
 func (m Model) viewScopeSelect() string {
@@ -135,7 +227,7 @@ func (m Model) viewComplete() string {
 }
 
 func (m Model) viewError() string {
-	title := styles.ErrorStyle.Render("❌ Installation Failed")
+	title := styles.ErrorStyle.Render("❌ Operation Failed")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		"",

@@ -39,7 +39,7 @@ func NewApp(version string, cfg *config.MarketplaceConfig, projectRoot string) A
 		tabs:         AllTabs(),
 		keys:         DefaultKeyMap(),
 		setupModel:   setup.New(cfg, projectRoot),
-		pluginsModel: plugins.New(cfg),
+		pluginsModel: plugins.New(cfg, projectRoot),
 		configModel:  tuiconfig.New(),
 		statusModel:  status.New(projectRoot),
 		aboutModel:   about.New(version),
@@ -60,9 +60,11 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, tea.Quit
 		case key.Matches(msg, a.keys.NextTab):
 			a.activeTab = TabID((int(a.activeTab) + 1) % TabCount())
+			a.onTabSwitch()
 			return a, nil
 		case key.Matches(msg, a.keys.PrevTab):
 			a.activeTab = TabID((int(a.activeTab) - 1 + TabCount()) % TabCount())
+			a.onTabSwitch()
 			return a, nil
 		}
 
@@ -160,6 +162,14 @@ func (a App) renderTabBar() string {
 			Render(bar)
 	}
 	return bar
+}
+
+// onTabSwitch refreshes tab state when switching to it.
+func (a *App) onTabSwitch() {
+	switch a.activeTab {
+	case TabPlugins:
+		a.pluginsModel.RefreshInstalled()
+	}
 }
 
 func (a App) renderContent() string {
