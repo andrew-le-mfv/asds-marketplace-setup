@@ -41,7 +41,9 @@ roles:
 defaults:
   scope: project
 `
-	os.WriteFile(filepath.Join(projectDir, "marketplace.yaml"), []byte(mktYAML), 0o644)
+	pluginDir := filepath.Join(projectDir, ".claude-plugin")
+	os.MkdirAll(pluginDir, 0o755)
+	os.WriteFile(filepath.Join(pluginDir, "marketplace.yaml"), []byte(mktYAML), 0o644)
 
 	cfgs := registry.LoadAllMarketplaces("/nonexistent", projectDir)
 

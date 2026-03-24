@@ -11,7 +11,7 @@ import (
 //  1. Embedded default (always loaded as baseline)
 //  2. User marketplaces from marketplacesConfigPath (~/.config/asds/marketplaces.yaml)
 //  3. Remote fetch for each enabled marketplace URL
-//  4. Project-local marketplace.yaml at projectRoot/marketplace.yaml
+//  4. Project-local marketplace.yaml at projectRoot/.claude-plugin/marketplace.yaml
 //
 // Later layers override earlier ones by marketplace name.
 func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*config.MarketplaceConfig {
@@ -51,7 +51,7 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 
 	// Layer 4: Project-local marketplace.yaml
 	if projectRoot != "" {
-		localPath := filepath.Join(projectRoot, "marketplace.yaml")
+		localPath := filepath.Join(projectRoot, ".claude-plugin", "marketplace.yaml")
 		if data, readErr := os.ReadFile(localPath); readErr == nil {
 			if localCfg, parseErr := config.ParseMarketplaceConfig(data); parseErr == nil {
 				if validateErr := localCfg.Validate(); validateErr == nil {
