@@ -49,7 +49,8 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 		}
 	}
 
-	// Layer 4: Project-local marketplace.yaml
+	// Layer 4: Project-local .claude-plugin/marketplace.yaml
+	// If the file doesn't exist, try auto-discovering plugins from a local plugins/ directory.
 	if projectRoot != "" {
 		localPath := filepath.Join(projectRoot, ".claude-plugin", "marketplace.yaml")
 		if data, readErr := os.ReadFile(localPath); readErr == nil {
@@ -57,6 +58,10 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 				if validateErr := localCfg.Validate(); validateErr == nil {
 					addOrReplace(localCfg)
 				}
+			}
+		} else if discovered, discErr := DiscoverLocalPlugins(projectRoot); discErr == nil {
+			if validateErr := discovered.Validate(); validateErr == nil {
+				addOrReplace(discovered)
 			}
 		}
 	}

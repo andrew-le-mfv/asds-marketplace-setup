@@ -142,6 +142,94 @@ func TestDiscoverMarketplace_InvalidResponse(t *testing.T) {
 	}
 }
 
+func TestDiscoverPluginsFromGitHub_NestedWithMarker(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/repos/test-org/test-repo/contents/plugins":
+			w.Write([]byte(`[
+				{"name": "sample-plugin", "type": "dir"},
+				{"name": "asds", "type": "dir"},
+				{"name": "README.md", "type": "file"}
+			]`))
+		case "/repos/test-org/test-repo/contents/plugins/sample-plugin":
+			w.Write([]byte(`[
+				{"name": ".claude-plugin", "type": "dir"},
+				{"name": "skills", "type": "dir"}
+			]`))
+		case "/repos/test-org/test-repo/contents/plugins/asds":
+			// Group dir without .claude-plugin — should recurse.
+			w.Write([]byte(`[
+				{"name": "asds-core", "type": "dir"},
+				{"name": "asds-deploy", "type": "dir"},
+				{"name": "_source", "type": "dir"}
+			]`))
+		case "/repos/test-org/test-repo/contents/plugins/asds/asds-core":
+			w.Write([]byte(`[
+				{"name": ".claude-plugin", "type": "dir"},
+				{"name": "agents", "type": "dir"}
+			]`))
+		case "/repos/test-org/test-repo/contents/plugins/asds/asds-deploy":
+			w.Write([]byte(`[
+				{"name": ".claude-plugin", "type": "dir"},
+				{"name": "skills", "type": "dir"}
+			]`))
+		case "/repos/test-org/test-repo/contents/plugins/asds/_source":
+			// No .claude-plugin — should NOT be discovered.
+			w.Write([]byte(`[{"name": "hooks", "type": "dir"}]`))
+		case "/repos/test-org/test-repo/contents/external_plugins":
+			w.Write([]byte(`[{"name": "ext-plugin", "type": "dir"}]`))
+		case "/repos/test-org/test-repo/contents/external_plugins/ext-plugin":
+			w.Write([]byte(`[
+				{"name": ".claude-plugin", "type": "dir"},
+				{"name": "skills", "type": "dir"}
+			]`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	// Override GitHub API base for this test.
+	oldBase := registry.GitHubAPIBase()
+	registry.SetGitHubAPIBase(server.URL)
+	defer registry.SetGitHubAPIBase(oldBase)
+
+	cfg, err := registry.DiscoverMarketplace("github.com/test-org/test-repo", "test-mkt")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	role, ok := cfg.Roles["default"]
+	if !ok {
+		t.Fatal("expected 'default' role")
+	}
+
+	names := map[string]bool{}
+	for _, p := range role.Plugins {
+		names[p.Name] = true
+	}
+
+	// Should discover: sample-plugin, asds-core, asds-deploy, ext-plugin
+	// Should NOT discover: asds (no .claude-plugin), _source (no .claude-plugin)
+	expected := []string{"sample-plugin", "asds-core", "asds-deploy", "ext-plugin"}
+	for _, name := range expected {
+		if !names[name] {
+			t.Errorf("expected plugin %q to be discovered, got %v", name, names)
+		}
+	}
+	if len(role.Plugins) != len(expected) {
+		t.Errorf("expected %d plugins, got %d: %v", len(expected), len(role.Plugins), role.Plugins)
+	}
+
+	// Verify _source and asds were NOT discovered.
+	for _, bad := range []string{"asds", "_source"} {
+		if names[bad] {
+			t.Errorf("did not expect %q to be discovered", bad)
+		}
+	}
+}
+
 func TestBuildRawURL(t *testing.T) {
 	tests := []struct {
 		input string

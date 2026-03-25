@@ -9,6 +9,10 @@ import (
 	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
+// MarketplacesChangedMsg is sent when marketplaces are added, removed, or toggled.
+// The app intercepts this to refresh other tabs.
+type MarketplacesChangedMsg struct{}
+
 // DiscoverCompleteMsg is sent when marketplace discovery finishes.
 type DiscoverCompleteMsg struct {
 	Error error
@@ -30,7 +34,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.discoverErr = ""
 		}
 		m.step = StepDiscoverResult
-		return m, nil
+		return m, func() tea.Msg { return MarketplacesChangedMsg{} }
 
 	case tea.KeyMsg:
 		switch m.step {
@@ -100,6 +104,7 @@ func (m Model) updateList(msg tea.KeyMsg) (Model, tea.Cmd) {
 		if m.cursor < len(m.mktsCfg.Marketplaces) && len(m.mktsCfg.Marketplaces) > 0 {
 			m.mktsCfg.Marketplaces[m.cursor].Enabled = !m.mktsCfg.Marketplaces[m.cursor].Enabled
 			m.save()
+			return m, func() tea.Msg { return MarketplacesChangedMsg{} }
 		}
 	}
 	return m, nil
@@ -172,6 +177,7 @@ func (m Model) updateRemoveConfirm(msg tea.KeyMsg) (Model, tea.Cmd) {
 			m.cursor--
 		}
 		m.step = StepList
+		return m, func() tea.Msg { return MarketplacesChangedMsg{} }
 	case "n", "esc":
 		m.step = StepList
 	}

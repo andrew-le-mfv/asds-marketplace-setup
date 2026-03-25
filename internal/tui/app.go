@@ -78,6 +78,11 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 
+	case tuiconfig.MarketplacesChangedMsg:
+		cfgs := registry.LoadAllMarketplaces(a.mktsCfgPath, a.projectRoot)
+		a.setupModel.RefreshMarketplaces(cfgs)
+		a.pluginsModel.RefreshMarketplaces(cfgs)
+
 	case tea.WindowSizeMsg:
 		a.width = msg.Width
 		a.height = msg.Height
