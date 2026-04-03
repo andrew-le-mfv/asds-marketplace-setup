@@ -27,13 +27,16 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 		}
 	}
 
-	// Layer 1: Embedded default
-	if defaultCfg, err := config.DefaultMarketplaceConfig(); err == nil {
-		addOrReplace(defaultCfg)
-	}
-
 	// Layer 2+3: User-configured marketplaces (fetch remote, fallback to cached)
 	mktsCfg, err := config.ReadMarketplacesConfig(marketplacesConfigPath)
+
+	// Layer 1: Embedded default (only when LoadDefaults is enabled)
+	if mktsCfg != nil && mktsCfg.LoadDefaults {
+		if defaultCfg, loadErr := config.DefaultMarketplaceConfig(); loadErr == nil {
+			addOrReplace(defaultCfg)
+		}
+	}
+
 	if err == nil {
 		for _, entry := range mktsCfg.EnabledMarketplaces() {
 			// Try simple remote fetch first (for repos with a config file).

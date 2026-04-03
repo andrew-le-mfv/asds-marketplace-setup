@@ -11,8 +11,22 @@ import (
 	"github.com/andrew-le-mfv/asds-marketplace-setup/pkg/registry"
 )
 
-func TestLoadAllMarketplaces_DefaultsOnly(t *testing.T) {
+func TestLoadAllMarketplaces_DefaultsDisabled(t *testing.T) {
 	cfgs := registry.LoadAllMarketplaces("/nonexistent", "/nonexistent/project")
+	if len(cfgs) != 0 {
+		t.Fatalf("expected 0 marketplaces when load_defaults is off, got %d", len(cfgs))
+	}
+}
+
+func TestLoadAllMarketplaces_DefaultsEnabled(t *testing.T) {
+	cfgDir := t.TempDir()
+	mktsCfgPath := filepath.Join(cfgDir, "marketplaces.yaml")
+	mktsCfg := &config.MarketplacesConfig{
+		LoadDefaults: true,
+	}
+	config.WriteMarketplacesConfig(mktsCfgPath, mktsCfg)
+
+	cfgs := registry.LoadAllMarketplaces(mktsCfgPath, "/nonexistent/project")
 	if len(cfgs) == 0 {
 		t.Fatal("expected at least 1 marketplace from defaults")
 	}

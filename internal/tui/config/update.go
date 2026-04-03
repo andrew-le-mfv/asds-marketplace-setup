@@ -68,8 +68,8 @@ func (m Model) updateList(msg tea.KeyMsg) (Model, tea.Cmd) {
 			m.cursor--
 		}
 	case "down", "j":
-		// Last item is the "+ Add Marketplace" action
-		if m.cursor < len(m.mktsCfg.Marketplaces) {
+		// Last two items are "+ Add Marketplace" and "Load Defaults" toggle
+		if m.cursor < len(m.mktsCfg.Marketplaces)+1 {
 			m.cursor++
 		}
 	case "enter":
@@ -101,6 +101,12 @@ func (m Model) updateList(msg tea.KeyMsg) (Model, tea.Cmd) {
 			m.step = StepRemoveConfirm
 		}
 	case " ":
+		if m.cursor == len(m.mktsCfg.Marketplaces)+1 {
+			// Toggle "Load Defaults"
+			m.mktsCfg.LoadDefaults = !m.mktsCfg.LoadDefaults
+			m.save()
+			return m, func() tea.Msg { return MarketplacesChangedMsg{} }
+		}
 		if m.cursor < len(m.mktsCfg.Marketplaces) && len(m.mktsCfg.Marketplaces) > 0 {
 			m.mktsCfg.Marketplaces[m.cursor].Enabled = !m.mktsCfg.Marketplaces[m.cursor].Enabled
 			m.save()

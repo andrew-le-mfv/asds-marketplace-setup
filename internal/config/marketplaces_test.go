@@ -47,13 +47,16 @@ func TestMarketplacesConfig_WriteAndRead(t *testing.T) {
 	}
 }
 
-func TestReadMarketplacesConfig_NotFound_ReturnsDefaults(t *testing.T) {
+func TestReadMarketplacesConfig_NotFound_ReturnsEmpty(t *testing.T) {
 	cfg, err := config.ReadMarketplacesConfig("/nonexistent/marketplaces.yaml")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if len(cfg.Marketplaces) != 1 {
-		t.Fatalf("expected 1 default marketplace, got %d", len(cfg.Marketplaces))
+	if len(cfg.Marketplaces) != 0 {
+		t.Fatalf("expected 0 marketplaces when load_defaults is off, got %d", len(cfg.Marketplaces))
+	}
+	if cfg.LoadDefaults {
+		t.Error("expected LoadDefaults to be false by default")
 	}
 }
 

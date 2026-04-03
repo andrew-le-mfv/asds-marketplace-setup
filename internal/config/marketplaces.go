@@ -19,6 +19,7 @@ type MarketplaceEntry struct {
 // Persisted at ~/.config/asds/marketplaces.yaml.
 type MarketplacesConfig struct {
 	Marketplaces []MarketplaceEntry `yaml:"marketplaces"`
+	LoadDefaults bool               `yaml:"load_defaults"`
 }
 
 // DefaultMarketplacesConfig returns a config with the built-in official marketplace.
@@ -49,8 +50,8 @@ func ReadMarketplacesConfig(path string) (*MarketplacesConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			cfg := DefaultMarketplacesConfig()
-			return &cfg, nil
+			cfg := &MarketplacesConfig{}
+			return cfg, nil
 		}
 		return nil, fmt.Errorf("reading marketplaces config: %w", err)
 	}
