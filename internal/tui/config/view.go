@@ -67,6 +67,20 @@ func (m Model) viewList() string {
 	}
 	lines = append(lines, addStyle.Render(addCursor+"+ Add Marketplace"))
 
+	// "Load Defaults" toggle
+	defaultsIdx := addIdx + 1
+	defaultsCursor := "  "
+	defaultsStyle := styles.NormalStyle
+	if m.cursor == defaultsIdx {
+		defaultsCursor = "▸ "
+		defaultsStyle = styles.SelectedStyle
+	}
+	defaultsIcon := "✗"
+	if m.mktsCfg.LoadDefaults {
+		defaultsIcon = "✓"
+	}
+	lines = append(lines, defaultsStyle.Render(fmt.Sprintf("%s[%s] Load Defaults", defaultsCursor, defaultsIcon)))
+
 	lines = append(lines, "")
 	lines = append(lines, styles.HelpStyle.Render("  Config: "+m.cfgPath))
 	lines = append(lines, "")

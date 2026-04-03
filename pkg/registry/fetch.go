@@ -23,6 +23,15 @@ const (
 	pluginJSONFile  = ".claude-plugin/marketplace.json"
 )
 
+// githubAPIBase is the GitHub API base URL. Override in tests via SetGitHubAPIBase.
+var githubAPIBase = "https://api.github.com"
+
+// GitHubAPIBase returns the current GitHub API base URL.
+func GitHubAPIBase() string { return githubAPIBase }
+
+// SetGitHubAPIBase overrides the GitHub API base URL (for testing).
+func SetGitHubAPIBase(base string) { githubAPIBase = base }
+
 var (
 	ghTokenOnce  sync.Once
 	ghTokenValue string
@@ -262,31 +271,12 @@ func fetchPluginRegistryName(repoPath string) string {
 	return ""
 }
 
-// discoverPluginsFromGitHub lists plugin directories under plugins/ in a GitHub repo.
-// Returns a MarketplaceConfig with all discovered plugins (no roles).
+// discoverPluginsFromGitHub scans a GitHub repo for plugin directories.
+// It checks each of pluginScanDirs (plugins/, external_plugins/) up to 3 levels
+// deep via the GitHub Contents API. A directory is a valid plugin if it contains
+// a .claude-plugin/ subdirectory.
 func discoverPluginsFromGitHub(repoPath, marketplaceName string) (*config.MarketplaceConfig, error) {
 	client := &http.Client{Timeout: defaultTimeout}
-	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/contents/plugins", repoPath)
-
-	resp, err := githubGet(client, apiURL)
-	if err != nil {
-		return nil, fmt.Errorf("listing plugins directory: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("listing plugins directory: HTTP %d", resp.StatusCode)
-	}
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading plugins listing: %w", err)
-	}
-
-	var entries []githubContentEntry
-	if err := json.Unmarshal(data, &entries); err != nil {
-		return nil, fmt.Errorf("parsing plugins listing: %w", err)
-	}
 
 	// Get the plugin registry name from .claude-plugin/marketplace.json.
 	// Falls back to the repo name (last path segment) if not available.
@@ -296,14 +286,12 @@ func discoverPluginsFromGitHub(repoPath, marketplaceName string) (*config.Market
 		registryName = parts[len(parts)-1]
 	}
 
+	seen := make(map[string]bool)
 	var plugins []config.PluginRef
-	for _, e := range entries {
-		if e.Type == "dir" {
-			plugins = append(plugins, config.PluginRef{
-				Name:   e.Name,
-				Source: e.Name + "@" + registryName,
-			})
-		}
+
+	for _, scanDir := range pluginScanDirs {
+		found := discoverPluginsInGitHub(client, repoPath, scanDir, registryName, 3, seen)
+		plugins = append(plugins, found...)
 	}
 
 	if len(plugins) == 0 {
@@ -324,6 +312,149 @@ func discoverPluginsFromGitHub(repoPath, marketplaceName string) (*config.Market
 			},
 		},
 	}, nil
+}
+
+// discoverPluginsInGitHub recursively lists directories via the GitHub Contents
+// API. A directory is a valid plugin if its children include a .claude-plugin/ entry.
+func discoverPluginsInGitHub(client *http.Client, repoPath, dirPath, registryName string, maxDepth int, seen map[string]bool) []config.PluginRef {
+	if maxDepth <= 0 {
+		return nil
+	}
+
+	apiURL := fmt.Sprintf("%s/repos/%s/contents/%s", githubAPIBase, repoPath, dirPath)
+	resp, err := githubGet(client, apiURL)
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil
+	}
+
+	var entries []githubContentEntry
+	if err := json.Unmarshal(data, &entries); err != nil {
+		return nil
+	}
+
+	// Collect subdirectories and check for .claude-plugin marker.
+	hasClaudePlugin := false
+	var subdirs []githubContentEntry
+	for _, e := range entries {
+		if e.Type == "dir" {
+			if e.Name == ".claude-plugin" {
+				hasClaudePlugin = true
+			} else {
+				subdirs = append(subdirs, e)
+			}
+		}
+	}
+
+	// If this directory has .claude-plugin, it is a plugin itself.
+	if hasClaudePlugin {
+		name := filepath.Base(dirPath)
+		if !seen[name] {
+			seen[name] = true
+			return []config.PluginRef{{
+				Name:   name,
+				Source: name + "@" + registryName,
+			}}
+		}
+		return nil
+	}
+
+	// Otherwise recurse into subdirectories.
+	var plugins []config.PluginRef
+	for _, sub := range subdirs {
+		childPath := dirPath + "/" + sub.Name
+		plugins = append(plugins, discoverPluginsInGitHub(client, repoPath, childPath, registryName, maxDepth-1, seen)...)
+	}
+	return plugins
+}
+
+// pluginScanDirs are the top-level directories scanned for plugins.
+var pluginScanDirs = []string{"plugins", "external_plugins"}
+
+// DiscoverLocalPlugins scans a local project for plugin directories.
+// It looks in each of pluginScanDirs (plugins/, external_plugins/) up to 3 levels
+// deep. Any directory containing a .claude-plugin/ subdirectory is treated as a
+// valid plugin. The result is not persisted — discovery runs fresh each time so
+// it always reflects the current directory layout.
+func DiscoverLocalPlugins(projectRoot string) (*config.MarketplaceConfig, error) {
+	// Derive marketplace name from the directory basename.
+	name := filepath.Base(projectRoot)
+
+	seen := make(map[string]bool)
+	var plugins []config.PluginRef
+
+	for _, scanDir := range pluginScanDirs {
+		root := filepath.Join(projectRoot, scanDir)
+		found := discoverPluginsIn(root, name, 3, seen)
+		plugins = append(plugins, found...)
+	}
+
+	if len(plugins) == 0 {
+		return nil, fmt.Errorf("no plugin directories found in %s", projectRoot)
+	}
+
+	return &config.MarketplaceConfig{
+		SchemaVersion: 1,
+		Marketplace: config.MarketplaceInfo{
+			Name:        name,
+			Description: "Auto-discovered from " + projectRoot,
+			Version:     "0.0.0",
+		},
+		Roles: map[string]config.Role{
+			"default": {
+				DisplayName: "Default",
+				Description: "All plugins from this marketplace",
+				Plugins:     plugins,
+			},
+		},
+	}, nil
+}
+
+// discoverPluginsIn walks dir up to maxDepth levels, collecting directories
+// that contain a .claude-plugin/ subdirectory. seen deduplicates by plugin name.
+func discoverPluginsIn(dir string, marketplaceName string, maxDepth int, seen map[string]bool) []config.PluginRef {
+	if maxDepth <= 0 {
+		return nil
+	}
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+
+	var plugins []config.PluginRef
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		child := filepath.Join(dir, e.Name())
+
+		// Check if this directory has a .claude-plugin/ subdirectory.
+		if info, statErr := os.Stat(filepath.Join(child, ".claude-plugin")); statErr == nil && info.IsDir() {
+			if !seen[e.Name()] {
+				seen[e.Name()] = true
+				plugins = append(plugins, config.PluginRef{
+					Name:   e.Name(),
+					Source: e.Name() + "@" + marketplaceName,
+				})
+			}
+			continue // don't recurse into a discovered plugin
+		}
+
+		// Recurse one level deeper.
+		plugins = append(plugins, discoverPluginsIn(child, marketplaceName, maxDepth-1, seen)...)
+	}
+
+	return plugins
 }
 
 // SaveCachedMarketplaceConfig saves a marketplace config to ~/.config/asds/<name>.yaml.

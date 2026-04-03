@@ -11,7 +11,7 @@ import (
 //  1. Embedded default (always loaded as baseline)
 //  2. User marketplaces from marketplacesConfigPath (~/.config/asds/marketplaces.yaml)
 //  3. Remote fetch for each enabled marketplace URL
-//  4. Project-local marketplace.yaml at projectRoot/marketplace.yaml
+//  4. Project-local marketplace.yaml at projectRoot/.claude-plugin/marketplace.yaml
 //
 // Later layers override earlier ones by marketplace name.
 func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*config.MarketplaceConfig {
@@ -27,13 +27,16 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 		}
 	}
 
-	// Layer 1: Embedded default
-	if defaultCfg, err := config.DefaultMarketplaceConfig(); err == nil {
-		addOrReplace(defaultCfg)
-	}
-
 	// Layer 2+3: User-configured marketplaces (fetch remote, fallback to cached)
 	mktsCfg, err := config.ReadMarketplacesConfig(marketplacesConfigPath)
+
+	// Layer 1: Embedded default (only when LoadDefaults is enabled)
+	if mktsCfg != nil && mktsCfg.LoadDefaults {
+		if defaultCfg, loadErr := config.DefaultMarketplaceConfig(); loadErr == nil {
+			addOrReplace(defaultCfg)
+		}
+	}
+
 	if err == nil {
 		for _, entry := range mktsCfg.EnabledMarketplaces() {
 			// Try simple remote fetch first (for repos with a config file).
@@ -49,14 +52,19 @@ func LoadAllMarketplaces(marketplacesConfigPath string, projectRoot string) []*c
 		}
 	}
 
-	// Layer 4: Project-local marketplace.yaml
+	// Layer 4: Project-local .claude-plugin/marketplace.yaml
+	// If the file doesn't exist, try auto-discovering plugins from a local plugins/ directory.
 	if projectRoot != "" {
-		localPath := filepath.Join(projectRoot, "marketplace.yaml")
+		localPath := filepath.Join(projectRoot, ".claude-plugin", "marketplace.yaml")
 		if data, readErr := os.ReadFile(localPath); readErr == nil {
 			if localCfg, parseErr := config.ParseMarketplaceConfig(data); parseErr == nil {
 				if validateErr := localCfg.Validate(); validateErr == nil {
 					addOrReplace(localCfg)
 				}
+			}
+		} else if discovered, discErr := DiscoverLocalPlugins(projectRoot); discErr == nil {
+			if validateErr := discovered.Validate(); validateErr == nil {
+				addOrReplace(discovered)
 			}
 		}
 	}
